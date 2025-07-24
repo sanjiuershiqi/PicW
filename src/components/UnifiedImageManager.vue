@@ -120,19 +120,78 @@
           </h4>
 
           <!-- 网格视图 -->
-          <v-row v-if="viewMode === 'grid'">
-            <v-col v-for="(image, index) in displayImages" :key="image.sha" cols="6" sm="4" md="3" lg="2">
-              <ImagePreview
-                :image="image"
-                :image-url="getImageUrl(image)"
-                :selected="selectedItems.includes(image.sha)"
-                :show-selection="true"
-                :show-delete="canDelete"
-                @update:selected="toggleSelection(image.sha, $event)"
-                @delete="deleteImage(image, index)"
-                @preview="openImagePreview(image, index)"
+          <v-row v-if="viewMode === 'grid'" class="image-grid">
+            <v-col v-for="(image, index) in displayImages" :key="image.sha" cols="6" sm="4" md="3" lg="3" xl="2" class="image-col">
+              <v-card
+                class="image-card"
+                :class="{ 'image-card--selected': selectedItems.includes(image.sha) }"
+                elevation="2"
                 @click="openImagePreview(image, index)"
-              />
+              >
+                <!-- 选择框 -->
+                <v-checkbox
+                  :model-value="selectedItems.includes(image.sha)"
+                  @update:model-value="toggleSelection(image.sha, $event)"
+                  @click.stop
+                  class="selection-checkbox"
+                  hide-details
+                  density="compact"
+                />
+
+                <!-- 图片 -->
+                <v-img :src="getImageUrl(image)" :alt="image.name" height="200" cover class="image-content">
+                  <template #placeholder>
+                    <div class="d-flex align-center justify-center fill-height">
+                      <v-progress-circular indeterminate size="32" color="primary" />
+                    </div>
+                  </template>
+
+                  <template #error>
+                    <div class="d-flex align-center justify-center fill-height">
+                      <v-icon icon="mdi-image-broken" size="48" color="grey" />
+                    </div>
+                  </template>
+
+                  <!-- 悬停操作层 -->
+                  <div class="image-overlay">
+                    <div class="overlay-actions">
+                      <v-btn
+                        icon="mdi-eye"
+                        variant="elevated"
+                        color="primary"
+                        size="small"
+                        @click.stop="openImagePreview(image, index)"
+                        title="预览"
+                      />
+                      <v-btn
+                        icon="mdi-download"
+                        variant="elevated"
+                        color="success"
+                        size="small"
+                        @click.stop="downloadImage(image)"
+                        title="下载"
+                      />
+                      <v-btn
+                        v-if="canDelete"
+                        icon="mdi-delete"
+                        variant="elevated"
+                        color="error"
+                        size="small"
+                        @click.stop="deleteImage(image, index)"
+                        title="删除"
+                      />
+                    </div>
+                  </div>
+                </v-img>
+
+                <!-- 图片信息 -->
+                <v-card-text class="pa-3">
+                  <div class="text-subtitle-2 text-truncate mb-1" :title="image.name">
+                    {{ image.name }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">{{ formatFileSize(image.size) }} • {{ getFileType(image.name) }}</div>
+                </v-card-text>
+              </v-card>
             </v-col>
           </v-row>
 
@@ -243,11 +302,13 @@ interface Props {
   username: string
   repository: string
   canDelete?: boolean
+  getCdnUrlItems?: (username: string, repository: string, directory: string, filename: string) => { text: string }[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
-  canDelete: false
+  canDelete: false,
+  getCdnUrlItems: undefined
 })
 
 const emit = defineEmits<{
@@ -446,7 +507,17 @@ const clearSearch = () => {
 
 // 图片操作
 const getImageUrl = (image: ImageItem) => {
-  // 这里应该根据实际的 CDN 逻辑生成图片 URL
+  if (props.getCdnUrlItems) {
+    try {
+      const directory = image.path.substring(0, image.path.lastIndexOf('/')) || '/'
+      const filename = image.name
+      const cdnUrls = props.getCdnUrlItems(props.username, props.repository, directory, filename)
+      return cdnUrls && cdnUrls.length > 0 ? cdnUrls[0].text : ''
+    } catch (error) {
+      console.error('生成CDN URL失败:', error)
+    }
+  }
+  // 备用方案
   return `https://cdn.jsdelivr.net/gh/${props.username}/${props.repository}@master${image.path}`
 }
 
@@ -543,6 +614,76 @@ watch(
     }
   }
 
+  // 图片网格样式
+  .image-grid {
+    .image-col {
+      padding: 8px;
+    }
+
+    .image-card {
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+        .image-overlay {
+          opacity: 1;
+        }
+      }
+
+      &--selected {
+        border: 2px solid rgb(var(--v-theme-primary));
+        box-shadow: 0 0 0 1px rgba(var(--v-theme-primary), 0.3);
+      }
+    }
+
+    .selection-checkbox {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 3;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 6px;
+      padding: 2px;
+      backdrop-filter: blur(4px);
+    }
+
+    .image-content {
+      position: relative;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.8) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .overlay-actions {
+      display: flex;
+      gap: 8px;
+
+      .v-btn {
+        backdrop-filter: blur(8px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+
   .batch-actions-bar {
     position: fixed;
     bottom: 20px;
@@ -550,6 +691,8 @@ watch(
     transform: translateX(-50%);
     z-index: 10;
     min-width: 400px;
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
   }
 
   .empty-state {
@@ -558,8 +701,57 @@ watch(
 }
 
 // 响应式调整
+@media (max-width: 960px) {
+  .unified-image-manager {
+    .image-grid {
+      .image-col {
+        padding: 6px;
+      }
+
+      .image-card {
+        .image-content {
+          height: 180px !important;
+        }
+      }
+
+      .overlay-actions {
+        gap: 6px;
+
+        .v-btn {
+          min-width: auto;
+        }
+      }
+    }
+  }
+}
+
 @media (max-width: 600px) {
   .unified-image-manager {
+    .image-grid {
+      .image-col {
+        padding: 4px;
+      }
+
+      .image-card {
+        .image-content {
+          height: 160px !important;
+        }
+
+        .selection-checkbox {
+          top: 4px;
+          left: 4px;
+        }
+      }
+
+      .overlay-actions {
+        gap: 4px;
+
+        .v-btn {
+          size: x-small;
+        }
+      }
+    }
+
     .batch-actions-bar {
       left: 10px;
       right: 10px;

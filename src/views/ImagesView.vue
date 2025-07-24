@@ -40,6 +40,7 @@
       :username="search.name"
       :repository="search.repository"
       :can-delete="islogin"
+      :get-cdn-url-items="getCdnUrlItems"
       @navigate="navigateToPath"
       @refresh="loadContent"
       @delete="delFile"
