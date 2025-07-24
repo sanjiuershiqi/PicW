@@ -173,30 +173,78 @@ watch(isOpen, open => {
 
 // 方法
 const loadImage = async () => {
-  if (!currentImage.value) {
+  if (!currentImage.value || !currentImageUrl.value) {
+    loading.value = false
+    error.value = true
     return
   }
 
   loading.value = true
   error.value = false
   imageDimensions.value = ''
+  isZoomed.value = false
 
   try {
     await nextTick()
-    // 图片会通过 @load 事件处理加载完成
+
+    // 添加超时机制，防止一直卡在加载状态
+    const timeout = setTimeout(() => {
+      if (loading.value) {
+        tryFallbackUrl()
+      }
+    }, 5000) // 5秒超时
+
+    // 预加载图片来检测是否能正常加载
+    const img = new Image()
+    img.onload = () => {
+      clearTimeout(timeout)
+      // 预加载成功，设置loading为false，让模板中的图片元素显示
+      loading.value = false
+    }
+    img.onerror = () => {
+      clearTimeout(timeout)
+      tryFallbackUrl()
+    }
+    img.src = currentImageUrl.value
   } catch (err) {
+    console.error('加载图片时出错:', err)
     error.value = true
     loading.value = false
   }
 }
 
+const tryFallbackUrl = () => {
+  if (!currentImage.value) {
+    return
+  }
+
+  // 尝试使用GitHub raw URL作为备用
+  const fallbackUrl = `https://raw.githubusercontent.com/sanjiuershiqi/PicW/master${currentImage.value.path}`
+
+  const img = new Image()
+  img.onload = () => {
+    // 更新当前图片URL为备用URL
+    if (currentImage.value) {
+      currentImage.value.url = fallbackUrl
+    }
+    loading.value = false
+    error.value = false
+  }
+  img.onerror = () => {
+    loading.value = false
+    error.value = true
+  }
+  img.src = fallbackUrl
+}
+
 const onImageLoad = (event: Event) => {
   loading.value = false
+  error.value = false
   const img = event.target as HTMLImageElement
   imageDimensions.value = `${img.naturalWidth} × ${img.naturalHeight}`
 }
 
-const onImageError = () => {
+const onImageError = (event: Event) => {
   loading.value = false
   error.value = true
 }
