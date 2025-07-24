@@ -7,7 +7,8 @@
       </v-app-bar-title>
       <v-btn class="ml-sm-3" icon="mdi-image-search-outline" to="/images"></v-btn>
       <v-btn class="ml-sm-3" icon="mdi-cog-outline" to="/setting"></v-btn>
-      <v-btn class="ml-sm-3" icon="mdi-test-tube" to="/test" title="测试页面"></v-btn>
+      <v-btn class="ml-sm-3" icon="mdi-test-tube" to="/test" title="组件测试"></v-btn>
+      <v-btn class="ml-sm-3" icon="mdi-folder-search" to="/folder-test" title="文件夹测试"></v-btn>
     </v-app-bar>
     <v-main>
       <router-view #default="{ Component, route }">

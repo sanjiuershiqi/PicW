@@ -34,5 +34,12 @@ export default <readonly RouteRecordRaw[]>[
     meta: {
       keepAlive: false
     }
+  },
+  {
+    path: '/folder-test',
+    component: () => import('@/views/FolderTestView.vue'),
+    meta: {
+      keepAlive: false
+    }
   }
 ]

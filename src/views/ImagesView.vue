@@ -8,14 +8,42 @@
       </div>
       <v-spacer />
       <v-btn-toggle v-model="viewMode" variant="outlined" density="compact" mandatory>
-        <v-btn value="grid" icon="mdi-view-grid" />
-        <v-btn value="list" icon="mdi-view-list" />
-        <v-btn value="stats" icon="mdi-chart-box" />
+        <v-btn value="browse" icon="mdi-folder-open" title="浏览文件夹" />
+        <v-btn value="search" icon="mdi-magnify" title="全局搜索" />
+        <v-btn value="grid" icon="mdi-view-grid" title="网格视图" />
+        <v-btn value="list" icon="mdi-view-list" title="列表视图" />
+        <v-btn value="stats" icon="mdi-chart-box" title="统计信息" />
       </v-btn-toggle>
     </div>
 
+    <!-- 文件夹浏览视图 -->
+    <template v-if="viewMode === 'browse'">
+      <FolderBrowser
+        :current-path="search.directory"
+        :folders="folderItems"
+        :images="imageItems"
+        :loading="!fileLoaded"
+        :username="search.name"
+        :repository="search.repository"
+        @navigate="navigateToPath"
+        @folder-selected="selectFolder"
+        @refresh="loadContent"
+      />
+    </template>
+
+    <!-- 全局搜索视图 -->
+    <template v-else-if="viewMode === 'search'">
+      <GlobalImageSearch
+        :username="search.name"
+        :repository="search.repository"
+        @navigate-to-folder="navigateToPath"
+        @image-selected="selectSearchResult"
+        @preview-image="previewSearchResult"
+      />
+    </template>
+
     <!-- 统计视图 -->
-    <template v-if="viewMode === 'stats'">
+    <template v-else-if="viewMode === 'stats'">
       <ImageStatistics :images="imageData" />
     </template>
 
@@ -145,6 +173,8 @@
 import BatchOperations from '@/components/BatchOperations.vue'
 import CloudImage from '@/components/CloudImage.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import FolderBrowser from '@/components/FolderBrowser.vue'
+import GlobalImageSearch from '@/components/GlobalImageSearch.vue'
 import ImageFilter from '@/components/ImageFilter.vue'
 import ImageStatistics from '@/components/ImageStatistics.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
@@ -176,7 +206,7 @@ const search = reactive({
 const fileLoaded = ref(false)
 const files = ref<RepoPathContent[]>([])
 const readmeText = ref('')
-const viewMode = ref<'grid' | 'list' | 'stats'>('grid')
+const viewMode = ref<'browse' | 'search' | 'grid' | 'list' | 'stats'>('browse')
 const selectedItems = ref<string[]>([])
 const filters = ref<ImageFilters>({
   search: '',
@@ -234,6 +264,16 @@ onActivated(async () => {
 
 // 计算属性
 const editHref = computed(() => `https://github.com/${search.name}/${search.repository}/edit/master/${search.directory}/README.md`)
+
+// 文件夹项
+const folderItems = computed(() => {
+  return files.value.filter(file => file.type === 'dir')
+})
+
+// 图片项
+const imageItems = computed(() => {
+  return files.value.filter(file => file.type === 'file')
+})
 
 // 筛选后的文件
 const filteredFiles = computed(() => {
@@ -397,6 +437,55 @@ const batchAddTags = (itemIds: string[], tagIds: string[]) => {
       tagsStore.addTagToImage(itemId, tagId)
     })
   })
+}
+
+// 文件夹导航方法
+const navigateToPath = (path: string) => {
+  // 更新当前路径并重新加载内容
+  search.directory = path
+  // 这里应该重新调用 API 加载新路径的内容
+  loadContent()
+}
+
+const selectFolder = (folder: any) => {
+  // 选择文件夹时的处理逻辑
+  console.log('选择文件夹:', folder)
+}
+
+// 搜索结果处理方法
+const selectSearchResult = (result: any) => {
+  // 处理搜索结果选择
+  console.log('选择搜索结果:', result)
+  // 可以导航到对应的文件夹
+  navigateToPath(result.directory)
+}
+
+const previewSearchResult = (result: any) => {
+  // 预览搜索结果中的图片
+  const url = getCdnUrlItems.value(search.name, search.repository, result.directory, result.name)[0]?.text || ''
+  if (url) {
+    window.open(url, '_blank')
+  }
+}
+
+// 加载内容的方法（需要根据实际API调整）
+const loadContent = async () => {
+  try {
+    fileLoaded.value = false
+    const data = await repoPathContent(search.name, search.repository, search.directory)
+    files.value = data
+
+    // 查找README文件
+    const readme = data.find(file => file.name.toLowerCase() === 'readme.md')
+    if (readme) {
+      // 加载README内容
+      // 这里需要实现README内容加载逻辑
+    }
+  } catch (error) {
+    console.error('加载内容失败:', error)
+  } finally {
+    fileLoaded.value = true
+  }
 }
 
 // 删除单个文件
