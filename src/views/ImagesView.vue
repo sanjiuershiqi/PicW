@@ -147,14 +147,19 @@ const loadContent = async () => {
     files.value = data.filter((val: any) => val.type === 'dir' || imageExtensions.some(ext => val.name.toLowerCase().endsWith(`.${ext}`)))
 
     // 加载 README
-    const readmeItem = data.find((val: any) => val.name.toLowerCase().endsWith('.md') && val.path === `${search.directory}/${val.name}`)
+    const readmeItem = data.find((val: any) => val.name.toLowerCase().endsWith('.md') && val.type === 'file')
 
     if (readmeItem) {
       try {
         readmeFileName.value = readmeItem.name
-        const readmeUrl = getCdnUrlItems.value(search.name, search.repository, search.directory, readmeItem.name)[0].text
-        const response = await fetch(readmeUrl)
-        readmeText.value = response.ok ? await response.text() : ''
+        const cdnUrls = getCdnUrlItems.value(search.name, search.repository, search.directory, readmeItem.name)
+        if (cdnUrls && cdnUrls.length > 0) {
+          const readmeUrl = cdnUrls[0].text
+          const response = await fetch(readmeUrl)
+          readmeText.value = response.ok ? await response.text() : ''
+        } else {
+          readmeText.value = ''
+        }
       } catch (error) {
         console.error('加载 README 失败:', error)
         readmeText.value = ''

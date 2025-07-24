@@ -512,12 +512,16 @@ const getImageUrl = (image: ImageItem) => {
       const directory = image.path.substring(0, image.path.lastIndexOf('/')) || '/'
       const filename = image.name
       const cdnUrls = props.getCdnUrlItems(props.username, props.repository, directory, filename)
-      return cdnUrls && cdnUrls.length > 0 ? cdnUrls[0].text : ''
+
+      if (cdnUrls && cdnUrls.length > 0 && cdnUrls[0].text) {
+        return cdnUrls[0].text
+      }
     } catch (error) {
       console.error('生成CDN URL失败:', error)
     }
   }
-  // 备用方案
+
+  // 备用方案 - 确保总是返回有效URL
   return `https://cdn.jsdelivr.net/gh/${props.username}/${props.repository}@master${image.path}`
 }
 
