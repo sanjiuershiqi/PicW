@@ -1,10 +1,23 @@
 <template>
   <v-container>
+    <!-- 用户登录设置 -->
     <v-card variant="flat" class="mb-6" title="登录" prepend-icon="mdi-github">
       <v-card-text>
         <UserSection />
       </v-card-text>
     </v-card>
+
+    <!-- 主题设置 -->
+    <div class="mb-6">
+      <ThemeSettings />
+    </div>
+
+    <!-- 标签管理 -->
+    <div class="mb-6">
+      <TagManager />
+    </div>
+
+    <!-- 函数设置 -->
     <v-card variant="flat" title="函数" prepend-icon="mdi-nodejs">
       <v-card-subtitle>
         <v-alert type="info" density="compact" class="mb-3">
@@ -36,6 +49,8 @@
 </template>
 
 <script setup lang="ts">
+import TagManager from '@/components/TagManager.vue'
+import ThemeSettings from '@/components/ThemeSettings.vue'
 import { useCodeStore } from '@/plugins/stores/code'
 import { storeToRefs } from 'pinia'
 import CodeSection from './CodeSection.vue'

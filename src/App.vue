@@ -1,12 +1,13 @@
 <template>
   <v-app @contextmenu.prevent v-scroll="onScroll">
     <v-app-bar :elevation="atTop ? 0 : 5" class="header">
-      <v-btn :icon="type == 'dark' ? 'mdi-weather-night' : 'mdi-weather-sunny'" @click="type = type == 'dark' ? 'light' : 'dark'"></v-btn>
+      <v-btn :icon="getThemeIcon" @click="toggleTheme" :title="getThemeTooltip" />
       <v-app-bar-title class="font-weight-bold">
         <span @click="$router.push('/')" class="home"> PicW </span>
       </v-app-bar-title>
       <v-btn class="ml-sm-3" icon="mdi-image-search-outline" to="/images"></v-btn>
       <v-btn class="ml-sm-3" icon="mdi-cog-outline" to="/setting"></v-btn>
+      <v-btn class="ml-sm-3" icon="mdi-test-tube" to="/test" title="测试页面"></v-btn>
     </v-app-bar>
     <v-main>
       <router-view #default="{ Component, route }">
@@ -30,14 +31,46 @@ import { useSnackBarStore } from '@/plugins/stores/snackbar'
 import { useThemeStore } from '@/plugins/stores/theme'
 import { storeToRefs } from 'pinia'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const $router = useRouter()
 
-const { type } = storeToRefs(useThemeStore())
+const themeStore = useThemeStore()
+const { config } = storeToRefs(themeStore)
 const { showMessage } = useSnackBarStore()
 const { show } = storeToRefs(useSnackBarStore())
+
+// 主题相关计算属性和方法
+const getThemeIcon = computed(() => {
+  switch (config.value.mode) {
+    case 'auto':
+      return 'mdi-brightness-auto'
+    case 'dark':
+      return 'mdi-weather-night'
+    case 'light':
+      return 'mdi-weather-sunny'
+    default:
+      return 'mdi-brightness-auto'
+  }
+})
+
+const getThemeTooltip = computed(() => {
+  switch (config.value.mode) {
+    case 'auto':
+      return '自动主题'
+    case 'dark':
+      return '深色主题'
+    case 'light':
+      return '浅色主题'
+    default:
+      return '自动主题'
+  }
+})
+
+const toggleTheme = () => {
+  themeStore.toggleTheme()
+}
 
 // 更新提示
 const { needRefresh, updateServiceWorker } = useRegisterSW({

@@ -1,0 +1,305 @@
+// ===== 路由切换动画 =====
+.router-transition {
+  &-enter-from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  &-leave-from {
+    display: none;
+  }
+
+  &-enter-active {
+    transition-property: opacity, transform;
+    transition-duration: 0.4s;
+    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+}
+
+// ===== 页面切换动画变体 =====
+.page-slide-left {
+  &-enter-from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  &-leave-to {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  &-enter-active,
+  &-leave-active {
+    transition: all 0.3s ease-out;
+  }
+}
+
+.page-slide-right {
+  &-enter-from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  &-leave-to {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  &-enter-active,
+  &-leave-active {
+    transition: all 0.3s ease-out;
+  }
+}
+
+.page-fade {
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+  }
+
+  &-enter-active,
+  &-leave-active {
+    transition: opacity 0.3s ease;
+  }
+}
+
+// ===== 列表项动画 =====
+.list-item {
+  &-enter-from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  &-leave-to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+
+  &-enter-active {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  &-leave-active {
+    transition: all 0.3s cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  }
+
+  &-move {
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+}
+
+// ===== 卡片动画 =====
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.card-scale {
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// ===== 按钮动画 =====
+.btn-bounce {
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--v-theme-primary), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0);
+  }
+}
+
+// ===== 加载动画 =====
+.loading-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-bounce {
+  animation: bounce 1.4s ease-in-out infinite both;
+}
+
+@keyframes bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+// ===== 淡入动画 =====
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-down {
+  animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ===== 缩放动画 =====
+.scale-in {
+  animation: scaleIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// ===== 滑动动画 =====
+.slide-in-left {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// ===== 工具类 =====
+.animate-delay-1 {
+  animation-delay: 0.1s;
+}
+.animate-delay-2 {
+  animation-delay: 0.2s;
+}
+.animate-delay-3 {
+  animation-delay: 0.3s;
+}
+.animate-delay-4 {
+  animation-delay: 0.4s;
+}
+.animate-delay-5 {
+  animation-delay: 0.5s;
+}
+
+.animate-duration-fast {
+  animation-duration: 0.2s;
+}
+.animate-duration-normal {
+  animation-duration: 0.4s;
+}
+.animate-duration-slow {
+  animation-duration: 0.6s;
+}
+
+// ===== 响应式动画控制 =====
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ===== 主题相关动画 =====
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

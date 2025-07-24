@@ -27,5 +27,12 @@ export default <readonly RouteRecordRaw[]>[
     meta: {
       keepAlive: true
     }
+  },
+  {
+    path: '/test',
+    component: () => import('@/views/TestView.vue'),
+    meta: {
+      keepAlive: false
+    }
   }
 ]
