@@ -1,4 +1,4 @@
-import { request } from './index'
+import axios from './api'
 
 export interface SearchResult {
   name: string
@@ -54,7 +54,7 @@ const recursiveSearch = async (
 
   try {
     // 获取当前文件夹内容
-    const response = await request.get(`/repos/${username}/${repository}/contents${currentPath}`)
+    const response = await axios.get(`/repos/${username}/${repository}/contents${currentPath}`)
     const items = Array.isArray(response.data) ? response.data : [response.data]
 
     for (const item of items) {
@@ -100,7 +100,7 @@ const searchInFolder = async (
   const results: SearchResult[] = []
 
   try {
-    const response = await request.get(`/repos/${username}/${repository}/contents${path}`)
+    const response = await axios.get(`/repos/${username}/${repository}/contents${path}`)
     const items = Array.isArray(response.data) ? response.data : [response.data]
 
     for (const item of items) {
@@ -195,7 +195,7 @@ export const getFolderStructure = async (
   path: string = ''
 ): Promise<{ folders: any[]; files: any[] }> => {
   try {
-    const response = await request.get(`/repos/${username}/${repository}/contents${path}`)
+    const response = await axios.get(`/repos/${username}/${repository}/contents${path}`)
     const items = Array.isArray(response.data) ? response.data : [response.data]
 
     const folders = items.filter(item => item.type === 'dir')
@@ -217,7 +217,7 @@ export const getFolderTree = async (username: string, repository: string, path: 
   }
 
   try {
-    const response = await request.get(`/repos/${username}/${repository}/contents${path}`)
+    const response = await axios.get(`/repos/${username}/${repository}/contents${path}`)
     const items = Array.isArray(response.data) ? response.data : [response.data]
 
     const tree = []
@@ -245,7 +245,7 @@ export const getFolderTree = async (username: string, repository: string, path: 
  */
 const hasImagesInFolder = async (username: string, repository: string, path: string): Promise<boolean> => {
   try {
-    const response = await request.get(`/repos/${username}/${repository}/contents${path}`)
+    const response = await axios.get(`/repos/${username}/${repository}/contents${path}`)
     const items = Array.isArray(response.data) ? response.data : [response.data]
 
     return items.some(item => item.type === 'file' && isImageFile(item.name))
