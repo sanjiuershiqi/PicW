@@ -241,6 +241,58 @@ export const getFolderTree = async (username: string, repository: string, path: 
 }
 
 /**
+ * 在仓库中搜索图片
+ */
+export const searchInRepository = async (
+  username: string,
+  repository: string,
+  query: string,
+  options: {
+    fileTypes?: string[]
+    sortBy?: string
+    maxResults?: number
+  } = {}
+) => {
+  try {
+    const { fileTypes = [], sortBy = 'name-asc', maxResults = 100 } = options
+
+    // 使用递归搜索功能
+    const results = await recursiveSearch(username, repository, '/', query)
+
+    // 应用文件类型筛选
+    let filteredResults = results
+    if (fileTypes.length > 0) {
+      filteredResults = results.filter(item => {
+        const ext = item.name.split('.').pop()?.toLowerCase()
+        return ext && fileTypes.includes(ext)
+      })
+    }
+
+    // 应用排序
+    filteredResults.sort((a, b) => {
+      switch (sortBy) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name)
+        case 'name-desc':
+          return b.name.localeCompare(a.name)
+        case 'size-asc':
+          return a.size - b.size
+        case 'size-desc':
+          return b.size - a.size
+        default:
+          return 0
+      }
+    })
+
+    // 限制结果数量
+    return filteredResults.slice(0, maxResults)
+  } catch (error) {
+    console.error('搜索失败:', error)
+    throw error
+  }
+}
+
+/**
  * 检查文件夹是否包含图片
  */
 const hasImagesInFolder = async (username: string, repository: string, path: string): Promise<boolean> => {
