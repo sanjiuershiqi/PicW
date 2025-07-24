@@ -18,6 +18,19 @@
 
     <!-- 文件夹浏览视图 -->
     <template v-if="viewMode === 'browse'">
+      <!-- README 显示 -->
+      <MarkdownCard
+        v-if="readmeText"
+        :content="readmeText"
+        :title="readmeFileName"
+        :show-edit="islogin"
+        :edit-url="editHref"
+        :file-info="readmeFileInfo"
+        show-copy
+        show-fullscreen
+        elevated
+      />
+
       <FolderBrowser
         :current-path="search.directory"
         :folders="folderItems"
@@ -33,6 +46,19 @@
 
     <!-- 全局搜索视图 -->
     <template v-else-if="viewMode === 'search'">
+      <!-- README 显示 -->
+      <MarkdownCard
+        v-if="readmeText"
+        :content="readmeText"
+        :title="readmeFileName"
+        :show-edit="islogin"
+        :edit-url="editHref"
+        :file-info="readmeFileInfo"
+        show-copy
+        show-fullscreen
+        elevated
+      />
+
       <GlobalImageSearch
         :username="search.name"
         :repository="search.repository"
@@ -66,23 +92,17 @@
         <div v-if="fileLoaded || files.length > 0">
           <template v-if="filteredFiles.length > 0">
             <!-- README 显示 -->
-            <v-slide-y-transition>
-              <v-card v-if="readmeText" class="mb-6 markdown-content">
-                <v-card-text class="position-relative">
-                  <v-btn
-                    v-if="islogin"
-                    icon="mdi-circle-edit-outline"
-                    variant="text"
-                    size="small"
-                    :href="editHref"
-                    target="_blank"
-                    class="position-absolute"
-                    style="right: 8px; top: 8px"
-                  />
-                  <VueShowdown :markdown="readmeText" flavor="github" :options="{ emoji: true }" />
-                </v-card-text>
-              </v-card>
-            </v-slide-y-transition>
+            <MarkdownCard
+              v-if="readmeText"
+              :content="readmeText"
+              :title="readmeFileName"
+              :show-edit="islogin"
+              :edit-url="editHref"
+              :file-info="readmeFileInfo"
+              show-copy
+              show-fullscreen
+              elevated
+            />
 
             <!-- 图片网格/列表 -->
             <transition-group name="list-item" tag="div">
@@ -182,6 +202,7 @@ import ImageFilter from '@/components/ImageFilter.vue'
 import ImageLightbox from '@/components/ImageLightbox.vue'
 import ImagePreview from '@/components/ImagePreview.vue'
 import ImageStatistics from '@/components/ImageStatistics.vue'
+import MarkdownCard from '@/components/MarkdownCard.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import filesize from '@/libs/filesize'
 import { deleteFile } from '@/plugins/axios/file'
@@ -211,6 +232,7 @@ const search = reactive({
 const fileLoaded = ref(false)
 const files = ref<RepoPathContent[]>([])
 const readmeText = ref('')
+const readmeFileName = ref('')
 const viewMode = ref<'browse' | 'search' | 'grid' | 'list' | 'stats'>('browse')
 const selectedItems = ref<string[]>([])
 const filters = ref<ImageFilters>({
@@ -272,7 +294,28 @@ onActivated(async () => {
 })
 
 // 计算属性
-const editHref = computed(() => `https://github.com/${search.name}/${search.repository}/edit/master/${search.directory}/README.md`)
+const editHref = computed(
+  () => `https://github.com/${search.name}/${search.repository}/edit/master/${search.directory}/${readmeFileName.value}`
+)
+
+const readmeFileInfo = computed(() => {
+  if (!readmeFileName.value) {
+    return null
+  }
+
+  const readmeFile = files.value.find(file => file.name.toLowerCase() === readmeFileName.value.toLowerCase())
+  return readmeFile
+    ? {
+        name: readmeFile.name,
+        size: readmeFile.size,
+        lastModified: new Date() // 这里应该从 GitHub API 获取实际时间
+      }
+    : {
+        name: readmeFileName.value,
+        size: readmeText.value.length,
+        lastModified: new Date()
+      }
+})
 
 // 文件夹项
 const folderItems = computed(() => {
@@ -487,7 +530,7 @@ const batchAddTags = (itemIds: string[], tagIds: string[]) => {
 const navigateToPath = (path: string) => {
   // 更新当前路径并重新加载内容
   search.directory = path
-  // 这里应该重新调用 API 加载新路径的内容
+  // 重新加载新路径的内容
   loadContent()
 }
 
@@ -517,13 +560,27 @@ const loadContent = async () => {
   try {
     fileLoaded.value = false
     const data = await repoPathContent(search.name, search.repository, search.directory)
-    files.value = data
 
-    // 查找README文件
-    const readme = data.find(file => file.name.toLowerCase() === 'readme.md')
-    if (readme) {
-      // 加载README内容
-      // 这里需要实现README内容加载逻辑
+    // 过滤文件类型（保持与原有逻辑一致）
+    const Suffix = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico', 'bmp', 'pjpeg', 'avif']
+    files.value = data.filter(val => val.type == 'dir' || Suffix.some(suffix => val.name.toLowerCase().endsWith(suffix)))
+
+    // 获取 markdown 文件内容
+    const readmeItem = data.find(val => val.name.toLowerCase().endsWith('.md') && val.path == `${search.directory}/${val.name}`)
+    if (readmeItem) {
+      try {
+        readmeFileName.value = readmeItem.name
+        const readmeUrl = getCdnUrlItems.value(search.name, search.repository, search.directory, readmeItem.name)[0].text
+        const response = await fetch(readmeUrl)
+        readmeText.value = response.ok ? await response.text() : ''
+      } catch (error) {
+        console.error('加载 README 失败:', error)
+        readmeText.value = ''
+        readmeFileName.value = ''
+      }
+    } else {
+      readmeText.value = ''
+      readmeFileName.value = ''
     }
   } catch (error) {
     console.error('加载内容失败:', error)
