@@ -88,23 +88,18 @@
             <transition-group name="list-item" tag="div">
               <v-row v-if="viewMode === 'grid'" key="grid">
                 <v-col v-for="(item, index) in filteredFiles" :key="item.sha" cols="12" sm="6" md="4" lg="3">
-                  <div class="position-relative">
-                    <v-checkbox
-                      :model-value="selectedItems.includes(item.sha)"
-                      @update:model-value="toggleSelection(item.sha, $event)"
-                      class="selection-checkbox"
-                      hide-details
-                      density="compact"
-                    />
-                    <CloudImage
-                      :item="item"
-                      :name="search.name"
-                      :repository="search.repository"
-                      :directory="search.directory"
-                      @delete="delFile(item, index)"
-                      class="card-hover"
-                    />
-                  </div>
+                  <ImagePreview
+                    :image="item"
+                    :image-url="getImageUrl(item)"
+                    :selected="selectedItems.includes(item.sha)"
+                    :show-selection="true"
+                    :show-delete="islogin"
+                    @update:selected="toggleSelection(item.sha, $event)"
+                    @delete="delFile(item, index)"
+                    @preview="handleImagePreview"
+                    @download="handleImageDownload"
+                    @click="handleImageClick"
+                  />
                 </v-col>
               </v-row>
 
@@ -166,6 +161,14 @@
         <SkeletonLoader v-else type="image-grid" :count="12" />
       </v-fade-transition>
     </template>
+
+    <!-- 图片预览灯箱 -->
+    <ImageLightbox
+      v-model="showLightbox"
+      :images="lightboxImages"
+      :current-index="currentLightboxIndex"
+      @update:current-index="currentLightboxIndex = $event"
+    />
   </v-container>
 </template>
 
@@ -176,6 +179,8 @@ import EmptyState from '@/components/EmptyState.vue'
 import FolderBrowser from '@/components/FolderBrowser.vue'
 import GlobalImageSearch from '@/components/GlobalImageSearch.vue'
 import ImageFilter from '@/components/ImageFilter.vue'
+import ImageLightbox from '@/components/ImageLightbox.vue'
+import ImagePreview from '@/components/ImagePreview.vue'
 import ImageStatistics from '@/components/ImageStatistics.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import filesize from '@/libs/filesize'
@@ -219,6 +224,10 @@ const filters = ref<ImageFilters>({
   customDateEnd: '',
   customSizeRange: [0, 10]
 })
+
+// 图片预览灯箱状态
+const showLightbox = ref(false)
+const currentLightboxIndex = ref(0)
 onActivated(async () => {
   const { query } = useRoute()
   search.name = query.name as string
@@ -356,6 +365,17 @@ const imageData = computed(() => {
     }))
 })
 
+// 灯箱图片数据
+const lightboxImages = computed(() => {
+  return filteredFiles.value.map(file => ({
+    name: file.name,
+    path: file.path,
+    sha: file.sha,
+    size: file.size,
+    url: getImageUrl(file)
+  }))
+})
+
 // 方法
 const updateFilters = (newFilters: ImageFilters) => {
   filters.value = newFilters
@@ -388,8 +408,12 @@ const formatDate = () => {
 }
 
 const previewImage = (item: RepoPathContent) => {
-  // 实现图片预览逻辑
-  window.open(getImageUrl(item), '_blank')
+  // 使用统一的灯箱预览
+  const index = filteredFiles.value.findIndex(file => file.sha === item.sha)
+  if (index !== -1) {
+    currentLightboxIndex.value = index
+    showLightbox.value = true
+  }
 }
 
 const downloadImage = async (item: RepoPathContent) => {
@@ -409,6 +433,26 @@ const downloadImage = async (item: RepoPathContent) => {
   } catch (error) {
     showMessage('下载失败', { color: 'error' })
   }
+}
+
+// 图片预览相关方法
+const handleImagePreview = (image: any) => {
+  // 找到图片在列表中的索引
+  const index = filteredFiles.value.findIndex(file => file.sha === image.sha)
+  if (index !== -1) {
+    currentLightboxIndex.value = index
+    showLightbox.value = true
+  }
+}
+
+const handleImageDownload = (image: any) => {
+  // ImagePreview 组件内部已经处理了下载逻辑
+  console.log('下载图片:', image.name)
+}
+
+const handleImageClick = (image: any) => {
+  // 点击图片时打开预览
+  handleImagePreview(image)
 }
 
 const batchDelete = async (itemIds: string[]) => {
