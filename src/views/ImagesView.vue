@@ -1,59 +1,78 @@
 <template>
-  <v-container>
-    <!-- 页面标题 -->
-    <div class="d-flex align-center mb-6">
-      <div>
-        <h1 class="text-h4 font-weight-bold">图片管理</h1>
-        <p class="text-subtitle-1 text-medium-emphasis">{{ search.repository }}</p>
-      </div>
-      <v-spacer />
-      <!-- 统计信息按钮 -->
-      <v-btn variant="outlined" prepend-icon="mdi-chart-box" @click="showStats = !showStats">
-        {{ showStats ? '隐藏统计' : '显示统计' }}
-      </v-btn>
-    </div>
+  <v-container fluid class="images-view">
+    <!-- 页面头部 -->
+    <v-card variant="flat" class="header-card mb-6">
+      <v-card-text class="d-flex align-center pa-4">
+        <!-- 左侧：标题和仓库信息 -->
+        <div class="d-flex align-center flex-grow-1">
+          <v-avatar color="primary" size="48" class="me-4">
+            <v-icon size="28">mdi-folder-multiple-image</v-icon>
+          </v-avatar>
+          <div>
+            <h1 class="text-h5 font-weight-bold mb-1">图片管理</h1>
+            <div class="d-flex align-center text-body-2 text-medium-emphasis">
+              <v-icon size="16" class="me-1">mdi-github</v-icon>
+              <span>{{ search.name }} / {{ search.repository }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧：操作按钮 -->
+        <div class="d-flex align-center gap-2">
+          <!-- 统计信息按钮 -->
+          <v-btn
+            :variant="showStats ? 'tonal' : 'outlined'"
+            :color="showStats ? 'primary' : undefined"
+            prepend-icon="mdi-chart-box"
+            @click="showStats = !showStats"
+          >
+            {{ showStats ? '隐藏统计' : '显示统计' }}
+          </v-btn>
+
+          <!-- README 切换按钮 -->
+          <v-btn
+            v-if="readmeText"
+            :variant="showReadme ? 'tonal' : 'outlined'"
+            :color="showReadme ? 'primary' : undefined"
+            prepend-icon="mdi-file-document"
+            @click="showReadme = !showReadme"
+          >
+            {{ showReadme ? '隐藏 README' : '显示 README' }}
+          </v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
 
     <!-- README 显示 -->
-    <MarkdownCard
-      v-if="readmeText"
-      :content="readmeText"
-      :title="readmeFileName"
-      :show-edit="islogin"
-      :edit-url="editHref"
-      :file-info="readmeFileInfo"
-      show-copy
-      show-fullscreen
-      elevated
-    />
+    <v-expand-transition>
+      <MarkdownCard
+        v-if="readmeText && showReadme"
+        :content="readmeText"
+        :title="readmeFileName"
+        :show-edit="islogin"
+        :edit-url="editHref"
+        :file-info="readmeFileInfo || undefined"
+        show-copy
+        show-fullscreen
+        elevated
+        class="mb-6"
+      />
+    </v-expand-transition>
 
     <!-- 统计信息 -->
-    <v-slide-y-transition>
+    <v-expand-transition>
       <ImageStatistics v-if="showStats" :images="imageData" class="mb-6" />
-    </v-slide-y-transition>
+    </v-expand-transition>
 
-    <!-- 统一图片管理器 -->
-    <UnifiedImageManager
-      :current-path="search.directory"
-      :folders="folderItems"
-      :images="imageItems"
-      :loading="!fileLoaded"
-      :username="search.name"
-      :repository="search.repository"
-      :can-delete="islogin"
-      :get-cdn-url-items="getCdnUrlItems"
-      @navigate="navigateToPath"
-      @refresh="loadContent"
-      @delete="delFile"
-      @folder-selected="selectFolder"
-    />
+    <!-- 统一图片管理器（新版重构） -->
+    <UnifiedImageManager :initial-path="search.directory" @path-change="handlePathChange" />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import ImageStatistics from '@/components/ImageStatistics.vue'
 import MarkdownCard from '@/components/MarkdownCard.vue'
-import UnifiedImageManager from '@/components/UnifiedImageManager.vue'
-import { deleteFile } from '@/plugins/axios/file'
+import UnifiedImageManager from '@/components/UnifiedImageManager/index.vue'
 import { repoPathContent, type RepoPathContent } from '@/plugins/axios/repo'
 import { useCodeStore } from '@/plugins/stores/code'
 import { useSnackBarStore } from '@/plugins/stores/snackbar'
@@ -75,11 +94,11 @@ const search = reactive({
 })
 
 // 状态管理
-const fileLoaded = ref(false)
 const files = ref<RepoPathContent[]>([])
 const readmeText = ref('')
 const readmeFileName = ref('')
 const showStats = ref(false)
+const showReadme = ref(true) // 默认显示 README
 
 // 计算属性
 const editHref = computed(
@@ -105,14 +124,6 @@ const readmeFileInfo = computed(() => {
       }
 })
 
-const folderItems = computed(() => {
-  return files.value.filter((file: any) => file.type === 'dir')
-})
-
-const imageItems = computed(() => {
-  return files.value.filter((file: any) => file.type === 'file')
-})
-
 const imageData = computed(() => {
   return files.value
     .filter((file: any) => file.type === 'file')
@@ -136,15 +147,19 @@ onActivated(async () => {
   await loadContent()
 })
 
-// 加载内容
+// 处理路径变化
+const handlePathChange = async (newPath: string) => {
+  search.directory = newPath
+  await loadContent()
+}
+
+// 加载内容（仅用于 README 和统计）
 const loadContent = async () => {
   try {
-    fileLoaded.value = false
     const data = await repoPathContent(search.name, search.repository, search.directory)
 
-    // 过滤图片文件
-    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico', 'bmp', 'tiff', 'avif']
-    files.value = data.filter((val: any) => val.type === 'dir' || imageExtensions.some(ext => val.name.toLowerCase().endsWith(`.${ext}`)))
+    // 保存文件列表用于 README 和统计
+    files.value = data
 
     // 加载 README
     const readmeItem = data.find((val: any) => val.name.toLowerCase().endsWith('.md') && val.type === 'file')
@@ -172,38 +187,25 @@ const loadContent = async () => {
   } catch (error) {
     console.error('加载内容失败:', error)
     showMessage('加载失败', { color: 'error' })
-  } finally {
-    fileLoaded.value = true
-  }
-}
-
-// 导航方法
-const navigateToPath = (path: string) => {
-  search.directory = path
-  loadContent()
-}
-
-const selectFolder = (folder: any) => {
-  console.log('选择文件夹:', folder.name)
-}
-
-// 删除文件
-const delFile = async (item: any) => {
-  try {
-    await deleteFile(search.name, search.repository, item.path, item.name, item.sha)
-    files.value.splice(files.value.indexOf(item), 1)
-    showMessage('删除成功', { color: 'success' })
-  } catch (error) {
-    console.error('删除失败:', error)
-    showMessage('删除失败', { color: 'error' })
   }
 }
 </script>
 
 <style scoped lang="scss">
-// 页面样式
-.v-container {
-  max-width: 1400px;
+.images-view {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header-card {
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(var(--v-theme-surface), 0.8) 0%, rgba(var(--v-theme-surface), 1) 100%);
+}
+
+.gap-2 {
+  gap: 8px;
 }
 
 // 动画效果
@@ -219,9 +221,33 @@ const delFile = async (item: any) => {
 }
 
 // 响应式调整
+@media (max-width: 960px) {
+  .images-view {
+    padding: 16px;
+  }
+
+  .header-card {
+    .d-flex {
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: 16px;
+    }
+  }
+}
+
 @media (max-width: 600px) {
-  .v-container {
-    padding: 16px 12px;
+  .images-view {
+    padding: 12px;
+  }
+
+  .header-card {
+    .v-avatar {
+      display: none;
+    }
+
+    .v-btn {
+      width: 100%;
+    }
   }
 }
 </style>

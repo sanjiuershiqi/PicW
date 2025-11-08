@@ -185,7 +185,7 @@ const { getTagStats } = storeToRefs(tagsStore)
 const { showMessage } = useSnackBarStore()
 
 const emit = defineEmits<{
-  'tag-selected': [tagId: string]
+  (e: 'tag-selected', tagId: string): void
 }>()
 
 // 新标签创建
@@ -278,12 +278,132 @@ const deleteTagConfirmed = async () => {
 </script>
 
 <style scoped lang="scss">
-.tag-card {
-  cursor: pointer;
-  transition: all 0.2s ease;
+.tag-manager {
+  // 标签卡片动画
+  .tag-card {
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
 
-  &:hover {
-    transform: translateY(-2px);
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+      &::before {
+        opacity: 1;
+      }
+
+      .v-avatar {
+        transform: scale(1.1) rotate(5deg);
+      }
+    }
+
+    .v-avatar {
+      transition: transform 0.3s ease;
+    }
+
+    .v-card-actions {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover .v-card-actions {
+      opacity: 1;
+    }
+  }
+
+  // 列表项动画
+  .v-list-item {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    margin-bottom: 4px;
+
+    &:hover {
+      background-color: rgba(var(--v-theme-primary), 0.05);
+      transform: translateX(4px);
+    }
+  }
+
+  // 输入框聚焦效果
+  :deep(.v-text-field) {
+    transition: all 0.3s ease;
+
+    &:focus-within {
+      transform: scale(1.01);
+    }
+  }
+
+  // 创建按钮动画
+  :deep(.v-btn) {
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+
+  // 网格布局动画
+  .v-row .v-col {
+    animation: fadeInUp 0.4s ease;
+    animation-fill-mode: both;
+
+    @for $i from 1 through 12 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.05}s;
+      }
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // 颜色选择器优化
+  :deep(.v-color-picker) {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  // 响应式优化
+  @media (max-width: 600px) {
+    .tag-card {
+      &:hover {
+        transform: translateY(-2px) scale(1.01);
+      }
+    }
+
+    .v-list-item {
+      &:hover {
+        transform: translateX(2px);
+      }
+    }
   }
 }
 </style>

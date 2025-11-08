@@ -159,11 +159,11 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  'update:selected': [selected: boolean]
-  preview: [image: ImageItem]
-  download: [image: ImageItem]
-  delete: [image: ImageItem]
-  click: [image: ImageItem]
+  (e: 'update:selected', selected: boolean): void
+  (e: 'preview', image: ImageItem): void
+  (e: 'download', image: ImageItem): void
+  (e: 'delete', image: ImageItem): void
+  (e: 'click', image: ImageItem): void
 }>()
 
 const { showMessage } = useSnackBarStore()
@@ -248,15 +248,72 @@ const handleDelete = () => {
   .image-card {
     position: relative;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, transparent 0%, rgba(var(--v-theme-primary), 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+
+      &::before {
+        opacity: 1;
+      }
+
+      .image-content {
+        transform: scale(1.05);
+      }
     }
 
     &--selected {
-      border: 2px solid rgb(var(--v-theme-primary));
+      border: 3px solid rgb(var(--v-theme-primary));
+      box-shadow: 0 0 0 3px rgba(var(--v-theme-primary), 0.2);
+
+      &::after {
+        content: '✓';
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        background: rgb(var(--v-theme-primary));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        z-index: 3;
+        animation: checkmark 0.3s ease;
+      }
+    }
+  }
+
+  @keyframes checkmark {
+    0% {
+      transform: scale(0) rotate(-45deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2) rotate(0deg);
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
     }
   }
 
@@ -265,13 +322,22 @@ const handleDelete = () => {
     top: 8px;
     left: 8px;
     z-index: 2;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 4px;
-    padding: 2px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 4px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+      background-color: white;
+    }
   }
 
   .image-content {
     position: relative;
+    transition: transform 0.3s ease;
 
     &:hover .image-overlay {
       opacity: 1;
@@ -284,36 +350,76 @@ const handleDelete = () => {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.8) 100%);
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 40%, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0.9) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 16px;
+    backdrop-filter: blur(2px);
   }
 
   .quick-actions {
     display: flex;
     justify-content: center;
     gap: 12px;
+    animation: fadeInDown 0.3s ease;
+
+    .v-btn {
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.15) translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      &:active {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .image-info {
     text-align: center;
     color: white;
+    animation: fadeInUp 0.3s ease;
 
     .image-name {
-      font-weight: 500;
+      font-weight: 600;
       font-size: 0.875rem;
       margin-bottom: 4px;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      letter-spacing: 0.3px;
     }
 
     .image-details {
       font-size: 0.75rem;
-      opacity: 0.9;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      opacity: 0.95;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }
@@ -325,6 +431,7 @@ const handleDelete = () => {
     display: flex;
     align-items: center;
     justify-content: center;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.95) 100%);
   }
 
   .preview-container {
@@ -340,6 +447,23 @@ const handleDelete = () => {
     max-width: 100%;
     max-height: 100%;
     cursor: pointer;
+    transition: transform 0.3s ease;
+    animation: zoomIn 0.3s ease;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes zoomIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   .preview-info {
@@ -347,30 +471,66 @@ const handleDelete = () => {
     bottom: 20px;
     left: 20px;
     z-index: 10;
+    animation: slideInLeft 0.3s ease;
+
+    .v-chip {
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 }
 
 // 响应式调整
 @media (max-width: 600px) {
-  .image-overlay {
-    padding: 12px;
-  }
+  .image-preview {
+    .image-card {
+      &:hover {
+        transform: translateY(-2px) scale(1.01);
+      }
+    }
 
-  .quick-actions {
-    gap: 8px;
+    .image-overlay {
+      padding: 12px;
+    }
 
-    .v-btn {
-      min-width: auto;
+    .quick-actions {
+      gap: 8px;
+
+      .v-btn {
+        min-width: auto;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+
+    .image-info {
+      .image-name {
+        font-size: 0.8rem;
+      }
+
+      .image-details {
+        font-size: 0.7rem;
+      }
     }
   }
 
-  .image-info {
-    .image-name {
-      font-size: 0.8rem;
-    }
-
-    .image-details {
-      font-size: 0.7rem;
+  .preview-card {
+    .preview-info {
+      bottom: 10px;
+      left: 10px;
     }
   }
 }

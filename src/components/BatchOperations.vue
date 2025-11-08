@@ -155,9 +155,9 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  'update:selectedItems': [items: string[]]
-  'delete-items': [items: string[]]
-  'add-tags': [items: string[], tags: string[]]
+  (e: 'update:selectedItems', items: string[]): void
+  (e: 'delete-items', items: string[]): void
+  (e: 'add-tags', items: string[], tags: string[]): void
 }>()
 
 const tagsStore = useTagsStore()
@@ -293,33 +293,30 @@ const downloadSelected = async () => {
   }
 
   showProgressDialog.value = true
-  progressTitle.value = '下载文件'
+  progressTitle.value = '批量下载'
   progress.value = 0
 
-  for (let i = 0; i < selectedItemsData.length; i++) {
-    const item = selectedItemsData[i]
-    progressText.value = `正在下载: ${item.name} (${i + 1}/${selectedItemsData.length})`
+  try {
+    // 使用批量下载功能
+    const { batchDownload } = await import('@/libs/batchDownload')
 
-    try {
-      const response = await fetch(item.url!)
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
+    const items = selectedItemsData.map(item => ({
+      url: item.url!,
+      filename: item.name
+    }))
 
-      const a = document.createElement('a')
-      a.href = url
-      a.download = item.name
-      a.click()
+    await batchDownload(items, `batch-download-${Date.now()}.zip`, downloadProgress => {
+      progress.value = (downloadProgress.current / downloadProgress.total) * 100
+      progressText.value = `正在下载: ${downloadProgress.currentFile} (${downloadProgress.current}/${downloadProgress.total})`
+    })
 
-      URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('下载失败:', item.name, error)
-    }
-
-    progress.value = ((i + 1) / selectedItemsData.length) * 100
+    showMessage(`成功下载 ${selectedItemsData.length} 个文件`, { color: 'success' })
+  } catch (error) {
+    console.error('批量下载失败:', error)
+    showMessage('批量下载失败，请重试', { color: 'error' })
+  } finally {
+    showProgressDialog.value = false
   }
-
-  showProgressDialog.value = false
-  showMessage(`下载完成: ${selectedItemsData.length} 个文件`, { color: 'success' })
 }
 
 const addTagsToSelected = () => {
@@ -355,25 +352,60 @@ const deleteSelected = async () => {
   top: 0;
   z-index: 10;
   margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .batch-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
+
+  .v-btn {
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
 }
 
 .selection-controls {
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgb(var(--v-theme-primary));
+    box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.2);
+  }
 }
 
 @media (max-width: 600px) {
   .batch-actions {
-    flex-wrap: wrap;
     gap: 4px;
 
     .v-btn {
       min-width: auto;
+      font-size: 0.75rem;
+    }
+  }
+
+  .batch-toolbar {
+    :deep(.v-card-text) {
+      padding: 12px !important;
     }
   }
 }

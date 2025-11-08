@@ -22,6 +22,13 @@ export default <readonly RouteRecordRaw[]>[
     }
   },
   {
+    path: '/favorites',
+    component: () => import('@/views/FavoritesView.vue'),
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
     path: '/setting',
     component: () => import('@/views/SettingView/index.vue'),
     meta: {

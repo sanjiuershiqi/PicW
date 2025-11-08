@@ -1,80 +1,153 @@
 <template>
-  <v-container>
-    <h1 class="text-h4 mb-6">文件夹浏览和搜索测试</h1>
+  <v-container fluid class="pa-4">
+    <!-- 页面标题 -->
+    <v-card class="mb-6" elevation="2">
+      <v-card-text class="d-flex align-center pa-6">
+        <v-avatar color="primary" size="48" class="me-4">
+          <v-icon icon="mdi-folder-search" size="28" />
+        </v-avatar>
+        <div>
+          <h1 class="text-h4 font-weight-bold mb-1">文件夹功能测试</h1>
+          <p class="text-body-2 text-medium-emphasis mb-0">测试文件夹浏览和全局搜索功能</p>
+        </div>
+      </v-card-text>
+    </v-card>
 
     <!-- 配置区域 -->
-    <v-card class="mb-6">
-      <v-card-title>测试配置</v-card-title>
-      <v-card-text>
+    <v-card class="mb-6" elevation="2">
+      <v-card-title class="bg-surface-variant">
+        <v-icon icon="mdi-cog" class="me-2" />
+        测试配置
+      </v-card-title>
+      <v-divider />
+      <v-card-text class="pa-6">
         <v-row>
           <v-col cols="12" md="4">
-            <v-text-field v-model="testConfig.username" label="GitHub 用户名" variant="outlined" density="comfortable" />
+            <v-text-field
+              v-model="testConfig.username"
+              label="GitHub 用户名"
+              variant="outlined"
+              density="comfortable"
+              prepend-inner-icon="mdi-account"
+              hint="输入 GitHub 用户名"
+              persistent-hint
+            />
           </v-col>
           <v-col cols="12" md="4">
-            <v-text-field v-model="testConfig.repository" label="仓库名" variant="outlined" density="comfortable" />
+            <v-text-field
+              v-model="testConfig.repository"
+              label="仓库名"
+              variant="outlined"
+              density="comfortable"
+              prepend-inner-icon="mdi-source-repository"
+              hint="输入仓库名称"
+              persistent-hint
+            />
           </v-col>
           <v-col cols="12" md="4">
-            <v-text-field v-model="testConfig.currentPath" label="当前路径" variant="outlined" density="comfortable" />
+            <v-text-field
+              v-model="testConfig.currentPath"
+              label="当前路径"
+              variant="outlined"
+              density="comfortable"
+              prepend-inner-icon="mdi-folder"
+              hint="当前浏览路径"
+              persistent-hint
+            />
           </v-col>
         </v-row>
       </v-card-text>
     </v-card>
 
     <!-- 功能切换 -->
-    <v-card class="mb-6">
-      <v-card-title>功能测试</v-card-title>
-      <v-card-text>
-        <v-btn-toggle v-model="activeTab" variant="outlined" density="comfortable" mandatory>
-          <v-btn value="browser" prepend-icon="mdi-folder-open"> 文件夹浏览 </v-btn>
-          <v-btn value="search" prepend-icon="mdi-magnify"> 全局搜索 </v-btn>
+    <v-card class="mb-6" elevation="2">
+      <v-card-title class="bg-surface-variant">
+        <v-icon icon="mdi-view-module" class="me-2" />
+        功能选择
+      </v-card-title>
+      <v-divider />
+      <v-card-text class="pa-6">
+        <v-btn-toggle v-model="activeTab" variant="outlined" density="comfortable" mandatory color="primary" divided>
+          <v-btn value="browser" prepend-icon="mdi-folder-open" size="large"> 文件夹浏览 </v-btn>
+          <v-btn value="search" prepend-icon="mdi-magnify" size="large"> 全局搜索 </v-btn>
         </v-btn-toggle>
+        <v-alert v-if="activeTab === 'browser'" type="info" variant="tonal" class="mt-4">
+          <v-icon icon="mdi-information" class="me-2" />
+          文件夹浏览模式：可以浏览目录结构，查看文件夹和图片
+        </v-alert>
+        <v-alert v-else type="info" variant="tonal" class="mt-4">
+          <v-icon icon="mdi-information" class="me-2" />
+          全局搜索模式：可以在整个仓库中搜索图片
+        </v-alert>
       </v-card-text>
     </v-card>
 
-    <!-- 文件夹浏览测试 -->
-    <template v-if="activeTab === 'browser'">
-      <FolderBrowser
-        :current-path="testConfig.currentPath"
-        :folders="mockFolders"
-        :images="mockImages"
-        :loading="loading"
-        :username="testConfig.username"
-        :repository="testConfig.repository"
-        @navigate="handleNavigate"
-        @folder-selected="handleFolderSelected"
-        @refresh="handleRefresh"
-      />
-    </template>
+    <!-- 功能展示区域 -->
+    <v-card elevation="2" class="mb-6">
+      <v-card-title class="bg-surface-variant">
+        <v-icon :icon="activeTab === 'browser' ? 'mdi-folder-open' : 'mdi-magnify'" class="me-2" />
+        {{ activeTab === 'browser' ? '文件夹浏览' : '全局搜索' }}
+      </v-card-title>
+      <v-divider />
+      <v-card-text class="pa-6">
+        <!-- 文件夹浏览测试 -->
+        <template v-if="activeTab === 'browser'">
+          <FolderBrowser
+            :current-path="testConfig.currentPath"
+            :folders="mockFolders"
+            :images="mockImages"
+            :loading="loading"
+            :username="testConfig.username"
+            :repository="testConfig.repository"
+            @navigate="handleNavigate"
+            @folder-selected="handleFolderSelected"
+            @refresh="handleRefresh"
+          />
+        </template>
 
-    <!-- 全局搜索测试 -->
-    <template v-if="activeTab === 'search'">
-      <GlobalImageSearch
-        :username="testConfig.username"
-        :repository="testConfig.repository"
-        @navigate-to-folder="handleNavigate"
-        @image-selected="handleImageSelected"
-        @preview-image="handlePreviewImage"
-      />
-    </template>
+        <!-- 全局搜索测试 -->
+        <template v-if="activeTab === 'search'">
+          <GlobalImageSearch
+            :username="testConfig.username"
+            :repository="testConfig.repository"
+            @navigate-to-folder="handleNavigate"
+            @image-selected="handleImageSelected"
+            @preview-image="handlePreviewImage"
+          />
+        </template>
+      </v-card-text>
+    </v-card>
 
     <!-- 操作日志 -->
-    <v-card class="mt-6">
-      <v-card-title class="d-flex align-center">
+    <v-card elevation="2">
+      <v-card-title class="d-flex align-center bg-surface-variant">
+        <v-icon icon="mdi-history" class="me-2" />
         操作日志
         <v-spacer />
-        <v-btn variant="text" size="small" prepend-icon="mdi-delete" @click="logs = []"> 清空 </v-btn>
+        <v-chip size="small" variant="flat" color="primary">{{ logs.length }} 条记录</v-chip>
+        <v-btn variant="text" size="small" prepend-icon="mdi-delete" @click="logs = []" class="ml-2"> 清空 </v-btn>
       </v-card-title>
-      <v-card-text>
-        <div v-if="logs.length === 0" class="text-center py-4 text-medium-emphasis">暂无操作记录</div>
-        <v-timeline v-else density="compact">
+      <v-divider />
+      <v-card-text class="pa-6">
+        <v-alert v-if="logs.length === 0" type="info" variant="tonal" class="text-center">
+          <v-icon icon="mdi-information-outline" class="me-2" />
+          暂无操作记录，开始测试功能后将显示操作日志
+        </v-alert>
+        <v-timeline v-else density="compact" class="log-timeline">
           <v-timeline-item v-for="(log, index) in logs.slice().reverse()" :key="index" size="small" :dot-color="getLogColor(log.type)">
-            <div class="d-flex align-center">
-              <v-icon :icon="getLogIcon(log.type)" size="small" class="me-2" />
-              <div>
+            <template #icon>
+              <v-icon :icon="getLogIcon(log.type)" size="x-small" />
+            </template>
+            <v-card variant="tonal" :color="getLogColor(log.type)">
+              <v-card-text class="py-2">
                 <div class="font-weight-medium">{{ log.action }}</div>
-                <div class="text-caption text-medium-emphasis">{{ log.details }} - {{ formatTime(log.timestamp) }}</div>
-              </div>
-            </div>
+                <div class="text-caption text-medium-emphasis">{{ log.details }}</div>
+                <div class="text-caption text-medium-emphasis mt-1">
+                  <v-icon icon="mdi-clock-outline" size="x-small" class="me-1" />
+                  {{ formatTime(log.timestamp) }}
+                </div>
+              </v-card-text>
+            </v-card>
           </v-timeline-item>
         </v-timeline>
       </v-card-text>
@@ -234,8 +307,25 @@ const formatTime = (timestamp: Date) => {
 </script>
 
 <style scoped lang="scss">
-.v-timeline {
-  max-height: 300px;
+.log-timeline {
+  max-height: 400px;
   overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.3);
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba(128, 128, 128, 0.5);
+    }
+  }
 }
 </style>

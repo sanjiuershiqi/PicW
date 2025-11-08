@@ -40,7 +40,9 @@
 <script setup lang="ts">
 import TextChip from '@/components/TextChip.vue'
 import blob2Base64 from '@/libs/blob2Base64'
+import { handleFileError } from '@/libs/errorHandler'
 import filesize from '@/libs/filesize'
+import { compressImage, compressSettings, shouldCompress } from '@/libs/imageCompressor'
 import { uploadFile } from '@/plugins/axios/file'
 import { repoPathContent } from '@/plugins/axios/repo'
 import { useCodeStore } from '@/plugins/stores/code'
@@ -95,11 +97,32 @@ const uploadImage = async () => {
     useSnackBarStore().showMessage('已经存在相同文件！', { timeout: 2000 })
   } catch (error) {
     try {
-      await uploadFile(name.value, repository.value, directory.value, useName.value, await blob2Base64(props.fileblob), progress)
+      let fileToUpload = props.fileblob
+
+      // 检查是否需要压缩
+      const settings = compressSettings.load()
+      if (settings?.enabled !== false && shouldCompress(props.fileblob, settings?.threshold)) {
+        try {
+          useSnackBarStore().showMessage('正在压缩图片...', { color: 'info', timeout: 2000 })
+          const result = await compressImage(props.fileblob, {
+            quality: settings?.quality,
+            maxWidth: settings?.maxWidth,
+            maxHeight: settings?.maxHeight
+          })
+
+          fileToUpload = result.file
+          useSnackBarStore().showMessage(`图片已压缩 ${result.ratio}`, { color: 'success', timeout: 3000 })
+        } catch (compressError) {
+          console.error('压缩失败，使用原图:', compressError)
+          useSnackBarStore().showMessage('压缩失败，使用原图上传', { color: 'warning', timeout: 2000 })
+        }
+      }
+
+      await uploadFile(name.value, repository.value, directory.value, useName.value, await blob2Base64(fileToUpload), progress)
       uploaded.value = true
     } catch (error) {
       progress.value = 0
-      console.error(error)
+      handleFileError(error, 'upload')
     }
   }
   uploading.value = false

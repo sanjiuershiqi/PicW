@@ -1,4 +1,5 @@
 import axios from './api'
+import { searchCache } from '@/libs/cacheManager'
 
 export interface SearchResult {
   name: string
@@ -241,7 +242,7 @@ export const getFolderTree = async (username: string, repository: string, path: 
 }
 
 /**
- * 在仓库中搜索图片
+ * 在仓库中搜索图片（带缓存）
  */
 export const searchInRepository = async (
   username: string,
@@ -253,11 +254,26 @@ export const searchInRepository = async (
     maxResults?: number
   } = {}
 ) => {
+  // 生成缓存键
+  const cacheKey = `search:${username}/${repository}:${query}:${JSON.stringify(options)}`
+
+  // 检查缓存
+  const cached = searchCache.get(cacheKey)
+  if (cached) {
+    console.log('使用缓存的搜索结果')
+    return cached
+  }
+
   try {
     const { fileTypes = [], sortBy = 'name-asc', maxResults = 100 } = options
 
     // 使用递归搜索功能
-    const results = await recursiveSearch(username, repository, '/', query)
+    const results = await recursiveSearch(username, repository, '/', query, {
+      query,
+      username,
+      repository,
+      fileTypes
+    })
 
     // 应用文件类型筛选
     let filteredResults = results
@@ -285,11 +301,30 @@ export const searchInRepository = async (
     })
 
     // 限制结果数量
-    return filteredResults.slice(0, maxResults)
+    const finalResults = filteredResults.slice(0, maxResults)
+
+    // 存入缓存
+    searchCache.set(cacheKey, finalResults)
+
+    return finalResults
   } catch (error) {
     console.error('搜索失败:', error)
     throw error
   }
+}
+
+/**
+ * 清除搜索缓存
+ */
+export const clearSearchCache = () => {
+  searchCache.clear()
+}
+
+/**
+ * 清除特定仓库的搜索缓存
+ */
+export const clearRepositorySearchCache = (username: string, repository: string) => {
+  searchCache.deletePattern(new RegExp(`^search:${username}/${repository}:`))
 }
 
 /**

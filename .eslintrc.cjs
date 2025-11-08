@@ -11,11 +11,19 @@ module.exports = {
     'vue/multi-word-component-names': [
       'error',
       {
-        ignores: ['index']
+        ignores: ['index', 'Toolbar']
       }
     ],
     'func-style': ['error', 'expression'],
     'no-var': 'error',
-    curly: 'error'
+    curly: 'error',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_'
+      }
+    ]
   }
 }

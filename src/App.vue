@@ -1,14 +1,42 @@
 <template>
   <v-app @contextmenu.prevent v-scroll="onScroll">
-    <v-app-bar :elevation="atTop ? 0 : 5" class="header">
-      <v-btn :icon="getThemeIcon" @click="toggleTheme" :title="getThemeTooltip" />
+    <v-app-bar :elevation="atTop ? 0 : 3" class="header">
+      <!-- 主题切换 -->
+      <v-btn :icon="getThemeIcon" @click="toggleTheme" variant="text" />
+
+      <!-- 标题 -->
       <v-app-bar-title class="font-weight-bold">
-        <span @click="$router.push('/')" class="home"> PicW </span>
+        <span @click="$router.push('/')" class="home">PicW</span>
       </v-app-bar-title>
-      <v-btn class="ml-sm-3" icon="mdi-image-search-outline" to="/images"></v-btn>
-      <v-btn class="ml-sm-3" icon="mdi-cog-outline" to="/setting"></v-btn>
-      <v-btn class="ml-sm-3" icon="mdi-test-tube" to="/test" title="组件测试"></v-btn>
-      <v-btn class="ml-sm-3" icon="mdi-folder-search" to="/folder-test" title="文件夹测试"></v-btn>
+
+      <v-spacer />
+
+      <!-- 导航按钮 -->
+      <v-btn to="/images" variant="text" prepend-icon="mdi-image-search-outline">
+        <span class="d-none d-sm-inline">图片管理</span>
+      </v-btn>
+
+      <v-btn to="/favorites" variant="text" prepend-icon="mdi-star">
+        <span class="d-none d-sm-inline">我的收藏</span>
+        <v-badge v-if="favoriteCount > 0" :content="favoriteCount" color="warning" inline />
+      </v-btn>
+
+      <v-btn to="/setting" icon="mdi-cog-outline" variant="text" />
+
+      <!-- 测试菜单 -->
+      <v-menu>
+        <template #activator="{ props }">
+          <v-btn v-bind="props" icon="mdi-test-tube" variant="text" />
+        </template>
+        <v-list density="compact">
+          <v-list-item to="/test" prepend-icon="mdi-test-tube">
+            <v-list-item-title>组件测试</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/folder-test" prepend-icon="mdi-folder-search">
+            <v-list-item-title>文件夹测试</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-app-bar>
     <v-main>
       <router-view #default="{ Component, route }">
@@ -30,6 +58,7 @@
 import SnackBar from '@/components/SnackBar.vue'
 import { useSnackBarStore } from '@/plugins/stores/snackbar'
 import { useThemeStore } from '@/plugins/stores/theme'
+import { useFavoritesStore } from '@/plugins/stores/favorites'
 import { storeToRefs } from 'pinia'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 import { computed, ref, watch } from 'vue'
@@ -41,6 +70,8 @@ const themeStore = useThemeStore()
 const { config } = storeToRefs(themeStore)
 const { showMessage } = useSnackBarStore()
 const { show } = storeToRefs(useSnackBarStore())
+const favoritesStore = useFavoritesStore()
+const favoriteCount = computed(() => favoritesStore.favoriteCount)
 
 // 主题相关计算属性和方法
 const getThemeIcon = computed(() => {
@@ -107,10 +138,59 @@ const onScroll = (event: Event) => {
 
 <style scoped lang="scss">
 .header {
-  transition: box-shadow 200ms ease;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
 }
+
 .home {
   cursor: pointer;
   user-select: none;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-btn {
+  text-transform: none;
+  letter-spacing: normal;
+
+  &:hover {
+    background-color: rgba(var(--v-theme-primary), 0.08);
+  }
+}
+
+.nav-btn-icon {
+  &:hover {
+    background-color: rgba(var(--v-theme-primary), 0.08);
+    transform: scale(1.1);
+  }
+
+  transition: all 0.2s;
+}
+
+.gap-2 {
+  gap: 8px;
+}
+
+// 响应式调整
+@media (max-width: 600px) {
+  .header {
+    .v-avatar {
+      display: none;
+    }
+
+    .v-divider {
+      display: none;
+    }
+  }
 }
 </style>

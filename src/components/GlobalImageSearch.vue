@@ -181,9 +181,9 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  'navigate-to-folder': [path: string]
-  'image-selected': [result: SearchResult]
-  'preview-image': [result: SearchResult]
+  (e: 'navigate-to-folder', path: string): void
+  (e: 'image-selected', result: SearchResult): void
+  (e: 'preview-image', result: SearchResult): void
 }>()
 
 const { getCdnUrlItems } = storeToRefs(useCodeStore())
@@ -287,8 +287,9 @@ const onSearchInput = debounce(() => {
     performSearch()
   } else {
     searchResults.value = []
+    currentPage.value = 1
   }
-}, 500)
+}, 300) // 减少延迟到 300ms，提升响应速度
 
 // 执行搜索
 const performSearch = async () => {
@@ -339,11 +340,82 @@ const previewImage = (result: SearchResult) => {
 .global-search {
   .search-result-card {
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    overflow: hidden;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+      :deep(.v-img) {
+        transform: scale(1.05);
+      }
+    }
+
+    :deep(.v-img) {
+      transition: transform 0.3s ease;
+    }
+  }
+
+  // 搜索输入框动画
+  :deep(.v-text-field) {
+    transition: all 0.3s ease;
+
+    &:focus-within {
+      transform: scale(1.02);
+    }
+  }
+
+  // 高级搜索区域
+  :deep(.v-expand-transition) {
+    .v-select {
+      animation: fadeIn 0.3s ease;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // 搜索结果网格优化
+  .v-row {
+    .v-col {
+      animation: slideUp 0.4s ease;
+      animation-fill-mode: both;
+
+      @for $i from 1 through 12 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.05}s;
+        }
+      }
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // 响应式优化
+  @media (max-width: 600px) {
+    .search-result-card {
+      &:hover {
+        transform: translateY(-2px);
+      }
     }
   }
 }

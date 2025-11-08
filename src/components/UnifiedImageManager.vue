@@ -139,7 +139,15 @@
                 />
 
                 <!-- 图片 -->
-                <v-img :src="getImageUrl(image)" :alt="image.name" height="200" cover class="image-content">
+                <v-img
+                  :src="getImageUrl(image)"
+                  :alt="image.name"
+                  height="200"
+                  cover
+                  class="image-content"
+                  :lazy-src="getPlaceholderImage()"
+                  loading="lazy"
+                >
                   <template #placeholder>
                     <div class="d-flex align-center justify-center fill-height">
                       <v-progress-circular indeterminate size="32" color="primary" />
@@ -156,12 +164,28 @@
                   <div class="image-overlay">
                     <div class="overlay-actions">
                       <v-btn
+                        :icon="isFavorite(image.sha) ? 'mdi-star' : 'mdi-star-outline'"
+                        variant="elevated"
+                        :color="isFavorite(image.sha) ? 'warning' : 'default'"
+                        size="small"
+                        @click.stop="toggleFavorite(image)"
+                        :title="isFavorite(image.sha) ? '取消收藏' : '收藏'"
+                      />
+                      <v-btn
                         icon="mdi-eye"
                         variant="elevated"
                         color="primary"
                         size="small"
                         @click.stop="openImagePreview(image, index)"
                         title="预览"
+                      />
+                      <v-btn
+                        icon="mdi-image-edit"
+                        variant="elevated"
+                        color="info"
+                        size="small"
+                        @click.stop="editImage(image)"
+                        title="编辑"
                       />
                       <v-btn
                         icon="mdi-download"
@@ -208,7 +232,7 @@
                     density="compact"
                   />
                   <v-avatar size="48" class="me-3">
-                    <v-img :src="getImageUrl(image)" />
+                    <v-img :src="getImageUrl(image)" :lazy-src="getPlaceholderImage()" loading="lazy" />
                   </v-avatar>
                 </template>
 
@@ -219,8 +243,17 @@
                 </v-list-item-subtitle>
 
                 <template #append>
-                  <v-btn icon="mdi-eye" variant="text" size="small" @click.stop="openImagePreview(image, index)" />
-                  <v-btn icon="mdi-download" variant="text" size="small" @click.stop="downloadImage(image)" />
+                  <v-btn
+                    :icon="isFavorite(image.sha) ? 'mdi-star' : 'mdi-star-outline'"
+                    variant="text"
+                    size="small"
+                    :color="isFavorite(image.sha) ? 'warning' : 'default'"
+                    @click.stop="toggleFavorite(image)"
+                    :title="isFavorite(image.sha) ? '取消收藏' : '收藏'"
+                  />
+                  <v-btn icon="mdi-eye" variant="text" size="small" @click.stop="openImagePreview(image, index)" title="预览" />
+                  <v-btn icon="mdi-image-edit" variant="text" size="small" @click.stop="editImage(image)" title="编辑" />
+                  <v-btn icon="mdi-download" variant="text" size="small" @click.stop="downloadImage(image)" title="下载" />
                   <v-btn
                     v-if="canDelete"
                     icon="mdi-delete"
@@ -228,6 +261,7 @@
                     size="small"
                     color="error"
                     @click.stop="deleteImage(image, index)"
+                    title="删除"
                   />
                 </template>
               </v-list-item>
@@ -255,6 +289,33 @@
       @update:current-index="currentLightboxIndex = $event"
     />
 
+    <!-- 图片编辑器 -->
+    <ImageEditor v-model="showEditor" :image-url="editingImageUrl" :image-name="editingImageName" @save="handleSaveEdit" />
+
+    <!-- 下载进度对话框 -->
+    <v-dialog v-model="downloadProgress.show" persistent max-width="500">
+      <v-card>
+        <v-card-title class="d-flex align-center">
+          <v-icon icon="mdi-download" class="me-2" />
+          正在下载图片
+        </v-card-title>
+        <v-card-text>
+          <div class="mb-4">
+            <v-progress-linear :model-value="(downloadProgress.current / downloadProgress.total) * 100" height="25" color="primary" rounded>
+              <template #default>
+                <strong>{{ downloadProgress.current }} / {{ downloadProgress.total }}</strong>
+              </template>
+            </v-progress-linear>
+          </div>
+          <div class="text-center text-caption text-medium-emphasis">
+            <v-icon icon="mdi-file-image" size="small" class="me-1" />
+            {{ downloadProgress.currentFile || '准备下载...' }}
+          </div>
+          <p class="mt-4 text-center text-body-2">请稍候，正在打包下载...</p>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
     <!-- 批量操作栏 -->
     <v-slide-y-reverse-transition>
       <v-card v-if="selectedItems.length > 0" variant="elevated" class="batch-actions-bar">
@@ -262,7 +323,7 @@
           <span class="text-subtitle-2"> 已选择 {{ selectedItems.length }} 个项目 </span>
           <v-spacer />
           <v-btn variant="text" @click="clearSelection">取消选择</v-btn>
-          <v-btn variant="text" prepend-icon="mdi-download">批量下载</v-btn>
+          <v-btn variant="text" prepend-icon="mdi-download" @click="batchDownload">批量下载</v-btn>
           <v-btn v-if="canDelete" variant="text" color="error" prepend-icon="mdi-delete" @click="batchDelete"> 批量删除 </v-btn>
         </v-card-text>
       </v-card>
@@ -273,10 +334,15 @@
 <script setup lang="ts">
 import EmptyState from '@/components/EmptyState.vue'
 import ImageLightbox from '@/components/ImageLightbox.vue'
+import ImageEditor from '@/components/ImageEditor.vue'
 import ImagePreview from '@/components/ImagePreview.vue'
+import { batchDownload as performBatchDownload, type DownloadProgress } from '@/libs/batchDownload'
+import { searchCache } from '@/libs/cacheManager'
+import { handleFileError, handleApiError } from '@/libs/errorHandler'
 import filesize from '@/libs/filesize'
 import { searchInRepository } from '@/plugins/axios/search'
 import { useSnackBarStore } from '@/plugins/stores/snackbar'
+import { useFavoritesStore } from '@/plugins/stores/favorites'
 import { computed, ref, watch } from 'vue'
 
 interface ImageItem {
@@ -312,13 +378,14 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  navigate: [path: string]
-  refresh: []
-  delete: [image: ImageItem, index: number]
-  'folder-selected': [folder: FolderItem]
+  (e: 'navigate', path: string): void
+  (e: 'refresh'): void
+  (e: 'delete', image: ImageItem, index: number): void
+  (e: 'folder-selected', folder: FolderItem): void
 }>()
 
 const { showMessage } = useSnackBarStore()
+const favoritesStore = useFavoritesStore()
 
 // 状态管理
 const searchQuery = ref('')
@@ -329,6 +396,19 @@ const fileTypeFilter = ref<string[]>([])
 const selectedItems = ref<string[]>([])
 const showLightbox = ref(false)
 const currentLightboxIndex = ref(0)
+
+// 编辑器状态
+const showEditor = ref(false)
+const editingImageUrl = ref('')
+const editingImageName = ref('')
+
+// 批量下载状态
+const downloadProgress = ref<DownloadProgress & { show: boolean }>({
+  show: false,
+  current: 0,
+  total: 0,
+  currentFile: ''
+})
 
 // 搜索状态
 const isSearching = computed(() => searchQuery.value.trim().length > 0)
@@ -448,12 +528,14 @@ const goToRoot = () => {
 }
 
 const refreshContent = () => {
+  // 清除搜索缓存
+  searchCache.clear()
   emit('refresh')
 }
 
 // 搜索功能
 const searchLoading = ref(false)
-let searchTimeout: number | null = null
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
 const onSearchInput = () => {
   // 清除之前的搜索定时器
@@ -485,15 +567,14 @@ const performSearch = async () => {
     })
 
     // 转换搜索结果格式
-    searchResults.value = results.map(result => ({
+    searchResults.value = results.map((result: any) => ({
       ...result,
       directory: result.path.substring(0, result.path.lastIndexOf('/')) || '/'
     }))
 
     showMessage(`找到 ${results.length} 个搜索结果`, { color: 'success' })
   } catch (error) {
-    console.error('搜索失败:', error)
-    showMessage('搜索失败，请稍后重试', { color: 'error' })
+    handleApiError(error, { customMessage: '搜索失败，请稍后重试' })
     searchResults.value = []
   } finally {
     searchLoading.value = false
@@ -534,6 +615,9 @@ const downloadImage = async (image: ImageItem) => {
   try {
     const url = getImageUrl(image)
     const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
     const blob = await response.blob()
     const downloadUrl = URL.createObjectURL(blob)
 
@@ -545,12 +629,58 @@ const downloadImage = async (image: ImageItem) => {
     URL.revokeObjectURL(downloadUrl)
     showMessage('下载成功', { color: 'success' })
   } catch (error) {
-    showMessage('下载失败', { color: 'error' })
+    handleFileError(error, 'download')
   }
 }
 
 const deleteImage = (image: ImageItem, index: number) => {
   emit('delete', image, index)
+}
+
+// 编辑功能
+const editImage = (image: ImageItem) => {
+  editingImageUrl.value = getImageUrl(image)
+  editingImageName.value = image.name
+  showEditor.value = true
+}
+
+const handleSaveEdit = async (blob: Blob, filename: string) => {
+  try {
+    // 下载编辑后的图片
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+
+    showMessage('图片已保存', { color: 'success' })
+  } catch (error) {
+    showMessage('保存失败', { color: 'error' })
+    console.error('保存编辑失败:', error)
+  }
+}
+
+// 收藏功能
+const isFavorite = (sha: string) => {
+  return favoritesStore.isFavorite(sha)
+}
+
+const toggleFavorite = (image: ImageItem) => {
+  const favoriteItem = {
+    sha: image.sha,
+    name: image.name,
+    path: image.path,
+    url: getImageUrl(image),
+    size: image.size,
+    repository: props.repository,
+    username: props.username
+  }
+
+  const added = favoritesStore.toggleFavorite(favoriteItem)
+  showMessage(added ? '已添加到收藏' : '已取消收藏', {
+    color: added ? 'success' : 'info'
+  })
 }
 
 // 选择功能
@@ -569,6 +699,41 @@ const clearSelection = () => {
   selectedItems.value = []
 }
 
+// 批量下载
+const batchDownload = async () => {
+  const selectedImages = displayImages.value.filter(img => selectedItems.value.includes(img.sha))
+
+  if (selectedImages.length === 0) {
+    showMessage('请先选择要下载的图片', { color: 'warning' })
+    return
+  }
+
+  try {
+    downloadProgress.value.show = true
+    downloadProgress.value.current = 0
+    downloadProgress.value.total = selectedImages.length
+    downloadProgress.value.currentFile = ''
+
+    const items = selectedImages.map(img => ({
+      url: getImageUrl(img),
+      filename: img.name
+    }))
+
+    await performBatchDownload(items, `images-${Date.now()}.zip`, progress => {
+      downloadProgress.value.current = progress.current
+      downloadProgress.value.total = progress.total
+      downloadProgress.value.currentFile = progress.currentFile
+    })
+
+    showMessage(`成功下载 ${selectedImages.length} 张图片`, { color: 'success' })
+    clearSelection()
+  } catch (error) {
+    handleFileError(error, 'batch')
+  } finally {
+    downloadProgress.value.show = false
+  }
+}
+
 const batchDelete = () => {
   // 实现批量删除逻辑
   showMessage(`将删除 ${selectedItems.value.length} 个项目`, { color: 'warning' })
@@ -582,6 +747,12 @@ const formatFileSize = (bytes: number) => {
 const getFileType = (filename: string) => {
   const ext = filename.split('.').pop()?.toUpperCase()
   return ext || 'Unknown'
+}
+
+// 获取占位图片
+const getPlaceholderImage = () => {
+  // 返回一个 1x1 透明 PNG 作为占位符
+  return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
 }
 
 // 监听路径变化，清除搜索
@@ -704,17 +875,86 @@ watch(
   }
 }
 
-// 响应式调整
+// 移动端适配
 @media (max-width: 960px) {
   .unified-image-manager {
+    // 工具栏优化
+    .toolbar-card {
+      :deep(.v-card-text) {
+        padding: 12px;
+      }
+    }
+
+    // 面包屑导航
+    :deep(.v-breadcrumbs) {
+      padding: 8px 0;
+      font-size: 0.875rem;
+
+      .v-breadcrumbs-item {
+        font-size: 0.875rem;
+      }
+
+      .v-breadcrumbs-divider {
+        padding: 0 8px;
+      }
+    }
+
+    // 搜索框
+    :deep(.v-text-field) {
+      max-width: 200px !important;
+      font-size: 0.875rem;
+    }
+
+    // 快速操作栏
+    .d-flex.align-center {
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .v-btn {
+        font-size: 0.75rem;
+        padding: 0 8px;
+      }
+    }
+
+    // 文件夹卡片
+    .folder-card {
+      :deep(.v-card-text) {
+        padding: 12px;
+
+        .v-icon {
+          font-size: 40px;
+        }
+
+        .text-subtitle-2 {
+          font-size: 0.875rem;
+        }
+      }
+    }
+
+    // 图片网格
     .image-grid {
       .image-col {
         padding: 6px;
       }
 
       .image-card {
+        border-radius: 8px;
+
         .image-content {
           height: 180px !important;
+          border-radius: 8px 8px 0 0;
+        }
+
+        :deep(.v-card-text) {
+          padding: 8px;
+
+          .text-subtitle-2 {
+            font-size: 0.875rem;
+          }
+
+          .text-caption {
+            font-size: 0.75rem;
+          }
         }
       }
 
@@ -723,6 +963,45 @@ watch(
 
         .v-btn {
           min-width: auto;
+          width: 36px;
+          height: 36px;
+        }
+      }
+    }
+
+    // 列表视图
+    :deep(.v-list) {
+      .v-list-item {
+        padding: 8px 12px;
+
+        .v-avatar {
+          width: 40px;
+          height: 40px;
+        }
+
+        .v-list-item-title {
+          font-size: 0.875rem;
+        }
+
+        .v-list-item-subtitle {
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    // 批量操作栏
+    .batch-actions-bar {
+      bottom: 16px;
+      min-width: 90%;
+      left: 5%;
+      transform: none;
+
+      :deep(.v-card-text) {
+        padding: 12px;
+
+        .v-btn {
+          font-size: 0.875rem;
+          padding: 0 12px;
         }
       }
     }
@@ -731,36 +1010,285 @@ watch(
 
 @media (max-width: 600px) {
   .unified-image-manager {
+    // 工具栏
+    .toolbar-card {
+      :deep(.v-card-text) {
+        padding: 8px;
+      }
+    }
+
+    // 面包屑和搜索框布局
+    .d-flex.align-center.mb-3 {
+      flex-direction: column;
+      align-items: stretch !important;
+      gap: 8px;
+
+      :deep(.v-breadcrumbs) {
+        flex-grow: 0 !important;
+      }
+
+      :deep(.v-text-field) {
+        max-width: 100% !important;
+      }
+    }
+
+    // 快速操作栏
+    .d-flex.align-center:not(.mb-3) {
+      .v-btn {
+        min-width: auto;
+        padding: 0 8px;
+
+        .v-icon {
+          margin: 0;
+        }
+
+        // 隐藏按钮文字，只显示图标
+        span:not(.v-icon) {
+          display: none;
+        }
+      }
+
+      .v-btn-toggle {
+        .v-btn {
+          padding: 0 8px;
+        }
+      }
+    }
+
+    // 文件夹网格
+    .folders-section {
+      :deep(.v-row) {
+        margin: -4px;
+
+        .v-col {
+          padding: 4px;
+        }
+      }
+    }
+
+    // 图片网格
     .image-grid {
       .image-col {
         padding: 4px;
       }
 
       .image-card {
+        border-radius: 6px;
+
         .image-content {
-          height: 160px !important;
+          height: 140px !important;
+          border-radius: 6px 6px 0 0;
         }
 
         .selection-checkbox {
           top: 4px;
           left: 4px;
+          transform: scale(0.9);
         }
+
+        :deep(.v-card-text) {
+          padding: 6px;
+
+          .text-subtitle-2 {
+            font-size: 0.8125rem;
+            line-height: 1.2;
+          }
+
+          .text-caption {
+            font-size: 0.6875rem;
+          }
+        }
+      }
+
+      // 移动端显示简化的操作按钮
+      .image-overlay {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
       }
 
       .overlay-actions {
         gap: 4px;
+        flex-wrap: wrap;
+        justify-content: center;
 
         .v-btn {
-          size: x-small;
+          width: 32px;
+          height: 32px;
+          min-width: 32px;
+
+          .v-icon {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+
+    // 列表视图
+    :deep(.v-list) {
+      .v-list-item {
+        padding: 6px 8px;
+        min-height: 56px;
+
+        .v-avatar {
+          width: 36px;
+          height: 36px;
+          margin-right: 8px;
+        }
+
+        .v-list-item-title {
+          font-size: 0.8125rem;
+        }
+
+        .v-list-item-subtitle {
+          font-size: 0.6875rem;
+        }
+
+        .v-btn {
+          width: 32px;
+          height: 32px;
+          min-width: 32px;
+
+          .v-icon {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+
+    // 批量操作栏
+    .batch-actions-bar {
+      bottom: 12px;
+      left: 8px;
+      right: 8px;
+      min-width: auto;
+      border-radius: 12px;
+
+      :deep(.v-card-text) {
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 4px;
+
+        .text-subtitle-2 {
+          font-size: 0.875rem;
+          width: 100%;
+          margin-bottom: 4px;
+        }
+
+        .v-btn {
+          font-size: 0.75rem;
+          padding: 0 8px;
+          height: 32px;
+        }
+      }
+    }
+
+    // 空状态
+    .empty-state {
+      padding: 2rem 1rem;
+
+      :deep(.v-icon) {
+        font-size: 64px;
+      }
+
+      :deep(.text-h6) {
+        font-size: 1rem;
+      }
+
+      :deep(.text-body-2) {
+        font-size: 0.875rem;
+      }
+    }
+
+    // 下载进度对话框
+    :deep(.v-dialog) {
+      .v-card {
+        margin: 16px;
+
+        .v-card-title {
+          font-size: 1rem;
+          padding: 12px 16px;
+        }
+
+        .v-card-text {
+          padding: 12px 16px;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+}
+
+// 触摸设备优化
+@media (hover: none) and (pointer: coarse) {
+  .unified-image-manager {
+    // 增大所有可点击元素
+    .folder-card,
+    .image-card {
+      min-height: 44px;
+    }
+
+    // 按钮最小尺寸
+    :deep(.v-btn) {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    // 复选框
+    :deep(.v-checkbox) {
+      .v-selection-control__input {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    // 图片卡片 - 移动端始终显示操作按钮
+    .image-card {
+      .image-overlay {
+        opacity: 0.9;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 60%);
+      }
+
+      .overlay-actions {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  }
+}
+
+// 横屏模式优化
+@media (max-width: 960px) and (orientation: landscape) {
+  .unified-image-manager {
+    .image-grid {
+      .image-card {
+        .image-content {
+          height: 160px !important;
         }
       }
     }
 
     .batch-actions-bar {
-      left: 10px;
-      right: 10px;
-      transform: none;
-      min-width: auto;
+      bottom: 8px;
+    }
+  }
+}
+
+// 小屏幕横屏
+@media (max-width: 600px) and (orientation: landscape) {
+  .unified-image-manager {
+    .toolbar-card {
+      :deep(.v-card-text) {
+        padding: 6px 8px;
+      }
+    }
+
+    .image-grid {
+      .image-card {
+        .image-content {
+          height: 120px !important;
+        }
+      }
     }
   }
 }
