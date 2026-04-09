@@ -1,29 +1,14 @@
 <template>
   <v-container class="home-container fill-height d-flex flex-column justify-center pa-0">
-    <div class="text-center mb-16 hero-section">
-      <div class="brutalist-badge font-mono mb-4">SYSTEM_UPLOAD_V1</div>
-      <h1 class="hero-title text-uppercase">UPLOAD</h1>
-      <h1 class="hero-title text-uppercase outline-text">IMAGES</h1>
-      <p class="hero-subtitle font-mono mt-6 max-w-2xl mx-auto">
-        [ SELECT OR DRAG FILES TO INITIALIZE TRANSFER ]
+    <div class="text-center mb-10 hero-section">
+      <h1 class="hero-title text-h4 font-weight-bold mb-3 text-primary">Upload Images</h1>
+      <p class="hero-subtitle text-body-1 text-secondary max-w-2xl mx-auto">
+        Drag and drop your images below, or click to browse.
       </p>
     </div>
 
     <!-- 上传区域 -->
     <v-card class="upload-card" :class="{ 'drag-over': isDragOver, 'has-files': files.length > 0 }" elevation="0">
-      <div class="card-borders">
-        <div class="border-top"></div>
-        <div class="border-right"></div>
-        <div class="border-bottom"></div>
-        <div class="border-left"></div>
-      </div>
-      <div class="corner-markers">
-        <div class="marker tl"></div>
-        <div class="marker tr"></div>
-        <div class="marker bl"></div>
-        <div class="marker br"></div>
-      </div>
-
       <v-file-input
         v-model="files"
         accept="image/*"
@@ -42,25 +27,25 @@
         <template #selection="{ fileNames }">
           <!-- 空状态提示 -->
           <div v-if="files.length === 0" class="upload-prompt py-16">
-            <div class="upload-icon-container mb-8">
-              <v-icon icon="mdi-arrow-down-bold" size="80" class="upload-arrow" />
+            <div class="upload-icon-container mb-6">
+              <v-icon icon="mdi-cloud-upload-outline" size="48" color="secondary" />
             </div>
-            <h2 class="prompt-title text-uppercase mb-2">DROP_ZONE</h2>
-            <p class="prompt-subtitle font-mono mb-8">CLICK OR DRAG FILES HERE</p>
-            <div class="formats-supported font-mono">
-              <span>JPG</span> / <span>PNG</span> / <span>WEBP</span> / <span>GIF</span>
-            </div>
+            <h2 class="prompt-title text-h6 font-weight-medium mb-2">Drop files here</h2>
+            <p class="prompt-subtitle text-body-2 text-secondary mb-6">Support for JPG, PNG, WEBP, GIF</p>
+            <v-btn variant="tonal" color="primary" class="browse-btn">
+              Browse Files
+            </v-btn>
           </div>
 
           <!-- 文件列表 -->
           <div v-else class="files-container w-100">
-            <div class="files-header d-flex align-center justify-space-between pa-6 border-b">
+            <div class="files-header d-flex align-center justify-space-between pa-4 border-b bg-surface-variant">
               <div class="d-flex align-center">
-                <span class="count-badge font-mono mr-4">{{ files.length }}</span>
-                <h3 class="text-h5 font-weight-black text-uppercase mb-0">FILES_QUEUED</h3>
+                <v-icon color="primary" class="mr-2">mdi-file-multiple-outline</v-icon>
+                <span class="text-subtitle-1 font-weight-medium">{{ files.length }} files selected</span>
               </div>
-              <v-btn color="primary" variant="flat" prepend-icon="mdi-plus" class="add-more-btn font-mono" @click.stop="handleAddMore">
-                ADD_MORE
+              <v-btn color="primary" variant="text" size="small" prepend-icon="mdi-plus" @click.stop="handleAddMore">
+                Add More
               </v-btn>
             </div>
             
@@ -128,7 +113,7 @@ const handleAddMore = () => {
 
 <style scoped lang="scss">
 .home-container {
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -136,100 +121,27 @@ const handleAddMore = () => {
   animation: fadeDown 0.4s ease-out;
 }
 
-.brutalist-badge {
-  display: inline-block;
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
-  padding: 4px 12px;
-  font-size: 0.8rem;
-  letter-spacing: 2px;
-}
-
-.hero-title {
-  font-size: clamp(3rem, 8vw, 6rem);
-  line-height: 0.9;
-  letter-spacing: -2px;
-  margin: 0;
-  color: rgb(var(--v-theme-primary));
-  
-  &.outline-text {
-    color: transparent;
-    -webkit-text-stroke: 2px rgb(var(--v-theme-primary));
-  }
-}
-
-.hero-subtitle {
-  font-size: 1rem;
-  letter-spacing: 1px;
-  color: rgb(var(--v-theme-secondary));
-}
-
 .upload-card {
   position: relative;
   min-height: 400px;
-  background: rgb(var(--v-theme-surface)) !important;
+  background: rgb(var(--v-theme-surface));
+  border: 2px dashed rgb(var(--v-theme-border-color));
   transition: all 0.2s ease;
-  border-radius: 0 !important;
-
-  .card-borders {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    
-    div {
-      position: absolute;
-      background: rgb(var(--v-theme-primary));
-      transition: all 0.2s;
-    }
-    
-    .border-top { top: 0; left: 0; right: 0; height: 2px; }
-    .border-bottom { bottom: 0; left: 0; right: 0; height: 2px; }
-    .border-left { top: 0; bottom: 0; left: 0; width: 2px; }
-    .border-right { top: 0; bottom: 0; right: 0; width: 2px; }
-  }
-
-  .corner-markers {
-    position: absolute;
-    inset: -6px;
-    pointer-events: none;
-    
-    .marker {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      border: 2px solid rgb(var(--v-theme-primary));
-      background: rgb(var(--v-theme-surface));
-      transition: all 0.2s;
-      
-      &.tl { top: 0; left: 0; }
-      &.tr { top: 0; right: 0; }
-      &.bl { bottom: 0; left: 0; }
-      &.br { bottom: 0; right: 0; }
-    }
-  }
 
   &.drag-over {
     transform: scale(1.02);
-    background: rgb(var(--v-theme-accent)) !important;
+    border-color: rgb(var(--v-theme-primary));
+    background: rgba(var(--v-theme-primary), 0.02) !important;
     
-    .card-borders div {
+    .upload-icon-container {
       background: rgb(var(--v-theme-primary));
-      height: 4px;
-    }
-    .border-left, .border-right { width: 4px !important; }
-    
-    .corner-markers .marker {
-      background: rgb(var(--v-theme-accent));
-      transform: scale(1.5);
-    }
-    
-    .prompt-title, .prompt-subtitle, .formats-supported span {
-      color: rgb(var(--v-theme-primary)) !important;
+      .v-icon { color: rgb(var(--v-theme-on-primary)) !important; }
     }
   }
 
   &.has-files {
     min-height: auto;
+    border-style: solid;
   }
 
   :deep(.file-input) {
@@ -268,52 +180,28 @@ const handleAddMore = () => {
   pointer-events: none;
 
   .upload-icon-container {
-    width: 120px;
-    height: 120px;
-    border: 2px solid rgb(var(--v-theme-primary));
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(var(--v-theme-secondary), 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    background: rgb(var(--v-theme-background));
-    
-    .upload-arrow {
-      color: rgb(var(--v-theme-primary));
-      transition: transform 0.3s ease;
-    }
-  }
-
-  .prompt-title {
-    font-size: 2rem;
-    letter-spacing: 2px;
-    color: rgb(var(--v-theme-primary));
-  }
-
-  .prompt-subtitle {
-    letter-spacing: 1px;
-    color: rgb(var(--v-theme-secondary));
-  }
-
-  .formats-supported {
-    font-size: 0.8rem;
-    color: rgb(var(--v-theme-secondary));
-    
-    span {
-      display: inline-block;
-      padding: 2px 6px;
-      border: 1px solid currentColor;
-      margin: 0 4px;
-    }
   }
 }
 
 .upload-card:hover .upload-icon-container {
-  transform: translateY(-10px);
-  box-shadow: 8px 8px 0 rgb(var(--v-theme-accent));
+  transform: translateY(-4px);
+  background: rgba(var(--v-theme-primary), 0.05);
   
-  .upload-arrow {
-    transform: translateY(5px);
+  .v-icon {
+    color: rgb(var(--v-theme-primary)) !important;
   }
+}
+
+.browse-btn {
+  pointer-events: auto;
 }
 
 .files-container {
@@ -321,42 +209,19 @@ const handleAddMore = () => {
 }
 
 .border-b {
-  border-bottom: 2px solid rgb(var(--v-theme-border-color));
-}
-
-.count-badge {
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
-  padding: 4px 12px;
-  font-size: 1.2rem;
-}
-
-.add-more-btn {
-  border: 2px solid rgb(var(--v-theme-primary));
-  box-shadow: 4px 4px 0 rgb(var(--v-theme-accent));
-  transition: all 0.1s;
-  
-  &:hover {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 rgb(var(--v-theme-accent));
-  }
-  
-  &:active {
-    transform: translate(4px, 4px);
-    box-shadow: none;
-  }
+  border-bottom: 1px solid rgb(var(--v-theme-border-color));
 }
 
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  gap: 16px;
 }
 
 @keyframes fadeDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -373,7 +238,7 @@ const handleAddMore = () => {
 .list-enter-from,
 .list-leave-to {
   opacity: 0;
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
 .list-move {
@@ -391,31 +256,9 @@ const handleAddMore = () => {
       }
     }
   }
-
-  .upload-prompt {
-    .upload-icon-container {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 16px !important;
-      
-      .v-icon {
-        font-size: 40px !important;
-      }
-    }
-
-    .prompt-title {
-      font-size: 1.5rem;
-    }
-  }
   
   .grid-container {
     grid-template-columns: 1fr;
-  }
-  
-  .files-header {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 16px;
   }
 }
 </style>

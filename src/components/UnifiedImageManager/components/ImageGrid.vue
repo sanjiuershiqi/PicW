@@ -260,53 +260,45 @@ const formatFileSize = (bytes: number): string => {
 
 <style scoped lang="scss">
 .selected-card {
-  border-color: rgb(var(--v-theme-accent)) !important;
-  box-shadow: 4px 4px 0 rgb(var(--v-theme-accent)) !important;
-  transform: translate(-2px, -2px);
+  border-color: rgb(var(--v-theme-primary)) !important;
+  box-shadow: 0 0 0 1px rgb(var(--v-theme-primary)) !important;
+  transform: translateY(-2px);
   
   .selected-badge {
     position: absolute;
     top: 8px;
     right: 8px;
-    background: rgb(var(--v-theme-accent));
+    background: rgb(var(--v-theme-primary));
     color: rgb(var(--v-theme-on-primary));
     width: 24px;
     height: 24px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid rgb(var(--v-theme-primary));
     z-index: 2;
-    font-family: var(--font-mono);
-    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 }
 
 .image-card {
-  border-radius: 0;
   overflow: hidden;
-  border: 2px solid rgb(var(--v-theme-primary));
-  transition: all 0.1s;
+  border: 1px solid rgb(var(--v-theme-border-color));
+  transition: all 0.2s ease;
   background: rgb(var(--v-theme-surface));
   position: relative;
   
   &:hover {
-    transform: translate(-4px, -4px);
-    box-shadow: 6px 6px 0 rgb(var(--v-theme-accent));
-    border-color: rgb(var(--v-theme-accent));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+    border-color: rgba(var(--v-theme-primary), 0.2);
   }
 }
 
 .image-preview {
   cursor: pointer;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(var(--v-theme-primary), 0.05),
-    rgba(var(--v-theme-primary), 0.05) 10px,
-    transparent 10px,
-    transparent 20px
-  );
-  border-bottom: 2px solid rgb(var(--v-theme-primary));
+  background: rgb(var(--v-theme-surface-variant));
+  border-bottom: 1px solid rgb(var(--v-theme-border-color));
 }
 
 .image-actions {
@@ -314,45 +306,41 @@ const formatFileSize = (bytes: number): string => {
 }
 
 .image-name {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: uppercase;
+  font-weight: 500;
 }
 
 .image-list {
   background: transparent;
-  border: 2px solid rgb(var(--v-theme-primary));
+  border: 1px solid rgb(var(--v-theme-border-color));
+  border-radius: 8px;
   padding: 0;
   
   .selected-item {
-    background-color: rgba(var(--v-theme-accent), 0.1) !important;
-    border-left: 4px solid rgb(var(--v-theme-accent)) !important;
+    background-color: rgba(var(--v-theme-primary), 0.04) !important;
+    border-left: 3px solid rgb(var(--v-theme-primary)) !important;
   }
 
   .list-item-modern {
     margin-bottom: 0;
     border-radius: 0;
     border: none;
-    border-bottom: 2px solid rgb(var(--v-theme-primary));
-    border-left: 4px solid transparent;
+    border-bottom: 1px solid rgb(var(--v-theme-border-color));
+    border-left: 3px solid transparent;
     background: rgb(var(--v-theme-surface));
-    transition: all 0.1s;
-    padding: 8px 16px;
+    transition: all 0.15s ease;
+    padding: 12px 16px;
 
     &:last-child {
       border-bottom: none;
     }
 
     &:hover {
-      background-color: rgba(var(--v-theme-primary), 0.05);
-      padding-left: 24px;
+      background-color: rgba(var(--v-theme-primary), 0.02);
     }
   }
 }
 
 .selected-overlay {
-  background: rgba(var(--v-theme-accent), 0.2) !important;
-  backdrop-filter: grayscale(100%) contrast(150%);
+  background: rgba(var(--v-theme-primary), 0.05) !important;
 }
 </style>

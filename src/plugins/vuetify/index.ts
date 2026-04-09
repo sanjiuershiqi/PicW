@@ -10,67 +10,67 @@ export default createVuetify({
       light: {
         dark: false,
         colors: {
-          background: '#EAE6DF', // Brutalist paper/beige
-          surface: '#F4F1EC', // Slightly lighter for cards
-          primary: '#111111', // Almost pure black
-          secondary: '#4A4A4A', // Dark gray
-          accent: '#FF3300', // Brutalist neon red/orange
-          error: '#FF0000',
-          info: '#0000FF',
-          success: '#00FF00',
-          warning: '#FFFF00',
-          'surface-variant': '#111111',
-          'on-background': '#111111',
-          'on-surface': '#111111',
+          background: '#FAFAFA', // Clean light gray
+          surface: '#FFFFFF', // Pure white cards
+          primary: '#1A1A1A', // Soft black for text/primary
+          secondary: '#737373', // Medium gray for secondary text
+          accent: '#000000', // Solid black for emphasis
+          error: '#E53935',
+          info: '#3B82F6',
+          success: '#10B981',
+          warning: '#F59E0B',
+          'surface-variant': '#F5F5F5',
+          'on-background': '#1A1A1A',
+          'on-surface': '#1A1A1A',
           'on-primary': '#FFFFFF',
-          'on-surface-variant': '#FFFFFF',
+          'on-surface-variant': '#1A1A1A',
         },
         variables: {
-          'border-color': '#111111',
+          'border-color': '#E5E5E5',
           'border-opacity': 1,
-          'high-emphasis-opacity': 1,
-          'medium-emphasis-opacity': 0.8,
-          'disabled-opacity': 0.4,
-          'idle-opacity': 1,
-          'hover-opacity': 0.1,
-          'focus-opacity': 0.2,
-          'selected-opacity': 0.2,
-          'activated-opacity': 0.2,
-          'pressed-opacity': 0.3,
-          'dragged-opacity': 0.2,
+          'high-emphasis-opacity': 0.87,
+          'medium-emphasis-opacity': 0.6,
+          'disabled-opacity': 0.38,
+          'idle-opacity': 0.04,
+          'hover-opacity': 0.04,
+          'focus-opacity': 0.12,
+          'selected-opacity': 0.08,
+          'activated-opacity': 0.12,
+          'pressed-opacity': 0.12,
+          'dragged-opacity': 0.08,
         }
       },
       dark: {
         dark: true,
         colors: {
-          background: '#0F0F0F', // Brutalist deep black
-          surface: '#1A1A1A', // Dark surface
-          primary: '#EAE6DF', // Paper white for text/primary
-          secondary: '#888888',
-          accent: '#00FF00', // Brutalist neon green
-          error: '#FF0000',
-          info: '#0000FF',
-          success: '#00FF00',
-          warning: '#FFFF00',
-          'surface-variant': '#EAE6DF',
-          'on-background': '#EAE6DF',
-          'on-surface': '#EAE6DF',
-          'on-primary': '#0F0F0F',
-          'on-surface-variant': '#0F0F0F',
+          background: '#121212', // Deep dark gray
+          surface: '#1E1E1E', // Slightly lighter surface
+          primary: '#FAFAFA', // Off-white for text
+          secondary: '#A3A3A3', // Lighter gray
+          accent: '#FFFFFF', // Pure white for emphasis
+          error: '#EF4444',
+          info: '#60A5FA',
+          success: '#34D399',
+          warning: '#FBBF24',
+          'surface-variant': '#262626',
+          'on-background': '#FAFAFA',
+          'on-surface': '#FAFAFA',
+          'on-primary': '#121212',
+          'on-surface-variant': '#FAFAFA',
         },
         variables: {
-          'border-color': '#EAE6DF',
+          'border-color': '#333333',
           'border-opacity': 1,
           'high-emphasis-opacity': 1,
-          'medium-emphasis-opacity': 0.8,
-          'disabled-opacity': 0.4,
-          'idle-opacity': 1,
-          'hover-opacity': 0.1,
-          'focus-opacity': 0.2,
-          'selected-opacity': 0.2,
-          'activated-opacity': 0.2,
-          'pressed-opacity': 0.3,
-          'dragged-opacity': 0.2,
+          'medium-emphasis-opacity': 0.7,
+          'disabled-opacity': 0.5,
+          'idle-opacity': 0.1,
+          'hover-opacity': 0.04,
+          'focus-opacity': 0.12,
+          'selected-opacity': 0.08,
+          'activated-opacity': 0.12,
+          'pressed-opacity': 0.16,
+          'dragged-opacity': 0.08,
         }
       }
     }
@@ -78,28 +78,29 @@ export default createVuetify({
   defaults: {
     VCard: {
       elevation: 0,
-      rounded: '0', // No rounded corners in brutalism
+      rounded: 'lg', // 8px border radius for a clean look
     },
     VBtn: {
-      rounded: '0', // Sharp corners
+      rounded: 'md', // 6px border radius
       elevation: 0,
-      style: 'text-transform: uppercase; font-family: "Space Mono", monospace; font-weight: 700; letter-spacing: 1px;',
+      style: 'text-transform: none; font-weight: 500; letter-spacing: 0;',
     },
     VTextField: {
       variant: 'outlined',
-      rounded: '0',
+      rounded: 'md',
       hideDetails: 'auto',
+      density: 'comfortable',
     },
     VFileInput: {
       variant: 'outlined',
-      rounded: '0',
+      rounded: 'md',
       hideDetails: 'auto',
     },
     VChip: {
-      rounded: '0',
+      rounded: 'md',
     },
     VAvatar: {
-      rounded: '0',
+      rounded: 'md',
     }
   }
 })

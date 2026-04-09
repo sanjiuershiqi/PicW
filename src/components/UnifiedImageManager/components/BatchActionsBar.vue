@@ -1,35 +1,36 @@
 <template>
   <v-slide-y-reverse-transition>
     <div v-if="selectedCount > 0" class="batch-actions-wrapper">
-      <div class="brutalist-batch-bar">
-        <div class="d-flex align-center py-2 px-4 px-sm-6 w-100">
+      <div class="util-batch-bar">
+        <div class="d-flex align-center py-2 px-4 w-100">
           <!-- 选中信息 -->
-          <div class="selection-badge font-mono mr-4">
-            [{{ selectedCount }} SELECTED]
+          <div class="selection-badge mr-4">
+            <v-icon size="small" class="mr-1">mdi-check-circle</v-icon>
+            {{ selectedCount }} selected
           </div>
 
           <v-spacer />
 
           <!-- 操作按钮 -->
           <div class="batch-actions">
-            <v-btn variant="text" size="small" @click="$emit('copy-links')" class="action-btn font-mono">
+            <v-btn variant="text" size="small" @click="$emit('copy-links')" class="action-btn">
               <v-icon start size="small">mdi-link-variant</v-icon>
-              COPY
+              Copy Links
             </v-btn>
 
-            <v-btn variant="text" size="small" @click="$emit('batch-download')" class="action-btn font-mono">
+            <v-btn variant="text" size="small" @click="$emit('batch-download')" class="action-btn">
               <v-icon start size="small">mdi-download-outline</v-icon>
-              DOWNLOAD
+              Download
             </v-btn>
 
             <div class="divider-line mx-2"></div>
 
-            <v-btn variant="text" size="small" @click="$emit('batch-delete')" class="action-btn font-mono text-accent">
+            <v-btn variant="text" size="small" color="error" @click="$emit('batch-delete')" class="action-btn">
               <v-icon start size="small">mdi-delete-outline</v-icon>
-              DELETE
+              Delete
             </v-btn>
 
-            <v-btn variant="flat" size="small" icon="mdi-close" color="primary" class="ml-2 close-btn rounded-0" @click="$emit('clear-selection')" />
+            <v-btn variant="text" size="small" icon="mdi-close" color="secondary" class="ml-2 close-btn" @click="$emit('clear-selection')" />
           </div>
         </div>
       </div>
@@ -55,7 +56,7 @@ defineEmits<{
 <style scoped lang="scss">
 .batch-actions-wrapper {
   position: fixed;
-  bottom: 32px;
+  bottom: 24px;
   left: 0;
   right: 0;
   display: flex;
@@ -64,22 +65,25 @@ defineEmits<{
   pointer-events: none;
 }
 
-.brutalist-batch-bar {
+.util-batch-bar {
   pointer-events: auto;
-  background: rgb(var(--v-theme-surface));
-  border: 2px solid rgb(var(--v-theme-primary));
-  box-shadow: 8px 8px 0 rgb(var(--v-theme-accent));
+  background: rgba(var(--v-theme-surface), 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgb(var(--v-theme-border-color));
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  min-width: 600px;
+  min-width: 500px;
 }
 
 .selection-badge {
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
-  padding: 4px 12px;
-  font-weight: 700;
-  font-size: 0.9rem;
+  color: rgb(var(--v-theme-primary));
+  font-weight: 500;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
 }
 
 .batch-actions {
@@ -88,33 +92,35 @@ defineEmits<{
 }
 
 .action-btn {
-  letter-spacing: 1px;
-  font-weight: 700;
-  transition: all 0.1s;
-  border: 2px solid transparent;
-  color: rgb(var(--v-theme-primary));
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  transition: all 0.15s ease;
+  color: rgb(var(--v-theme-secondary));
 
   &:hover {
-    background: rgba(var(--v-theme-primary), 0.1);
-    border-color: rgb(var(--v-theme-primary));
-    transform: translate(-2px, -2px);
-    box-shadow: 2px 2px 0 rgb(var(--v-theme-primary));
+    background: rgba(var(--v-theme-primary), 0.05);
+    color: rgb(var(--v-theme-primary));
+  }
+  
+  &.text-error:hover {
+    background: rgba(var(--v-theme-error), 0.05);
+    color: rgb(var(--v-theme-error)) !important;
   }
 }
 
 .close-btn {
-  transition: all 0.1s;
+  transition: all 0.15s ease;
   &:hover {
-    transform: rotate(90deg) scale(1.1);
-    background: rgb(var(--v-theme-accent)) !important;
-    color: rgb(var(--v-theme-on-primary)) !important;
+    background: rgba(var(--v-theme-primary), 0.05);
+    color: rgb(var(--v-theme-primary)) !important;
   }
 }
 
 .divider-line {
-  width: 2px;
-  height: 24px;
-  background: rgb(var(--v-theme-primary));
+  width: 1px;
+  height: 16px;
+  background: rgb(var(--v-theme-border-color));
 }
 
 @media (max-width: 600px) {
@@ -123,7 +129,7 @@ defineEmits<{
     padding: 0 16px;
   }
   
-  .brutalist-batch-bar {
+  .util-batch-bar {
     min-width: auto;
     width: 100%;
   }

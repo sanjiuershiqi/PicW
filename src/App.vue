@@ -1,61 +1,69 @@
 <template>
   <v-app @contextmenu.prevent v-scroll="onScroll" class="app-container">
-    <header class="brutalist-header" :class="{ 'scrolled': !atTop }">
-      <div class="header-grid">
+    <header class="util-header" :class="{ 'scrolled': !atTop }">
+      <div class="header-content mx-auto w-100 px-6 d-flex align-center">
         <!-- Logo -->
-        <div class="header-cell logo-cell" @click="$router.push('/')">
-          <span class="logo-text">PICW</span>
-          <span class="logo-badge">SYS</span>
+        <div class="logo-area d-flex align-center cursor-pointer" @click="$router.push('/')">
+          <v-icon icon="mdi-image-multiple" class="mr-2 text-primary" size="24" />
+          <span class="logo-text font-weight-bold">PicW</span>
         </div>
 
+        <v-spacer />
+
         <!-- Navigation -->
-        <nav class="header-cell nav-cell d-none d-md-flex">
+        <nav class="nav-area d-none d-md-flex align-center">
           <router-link to="/images" class="nav-link" active-class="active">
-            <span class="link-num">01</span>
-            <span class="link-text">IMAGES</span>
+            <v-icon size="small" class="mr-1">mdi-image-search-outline</v-icon>
+            Images
           </router-link>
           
           <router-link to="/favorites" class="nav-link" active-class="active">
-            <span class="link-num">02</span>
-            <span class="link-text">FAVORITES</span>
-            <span v-if="favoriteCount > 0" class="fav-count">[{{ favoriteCount }}]</span>
+            <v-icon size="small" class="mr-1">mdi-star-outline</v-icon>
+            Favorites
+            <v-chip v-if="favoriteCount > 0" size="x-small" color="primary" variant="flat" class="ml-1 px-1">{{ favoriteCount }}</v-chip>
           </router-link>
         </nav>
 
+        <div class="divider-vertical mx-4 d-none d-md-block"></div>
+
         <!-- Tools -->
-        <div class="header-cell tools-cell">
-          <v-btn icon variant="text" @click="toggleTheme" class="tool-btn">
-            <v-icon>{{ getThemeIcon }}</v-icon>
+        <div class="tools-area d-flex align-center">
+          <v-btn icon variant="text" size="small" @click="toggleTheme" class="tool-btn mr-1" color="secondary">
+            <v-icon size="20">{{ getThemeIcon }}</v-icon>
           </v-btn>
           
-          <v-btn to="/setting" icon variant="text" class="tool-btn">
-            <v-icon>mdi-cog</v-icon>
+          <v-btn to="/setting" icon variant="text" size="small" class="tool-btn mr-1" color="secondary">
+            <v-icon size="20">mdi-cog-outline</v-icon>
           </v-btn>
 
-          <v-menu transition="none">
+          <v-menu location="bottom end">
             <template #activator="{ props }">
-              <v-btn v-bind="props" icon variant="text" class="tool-btn">
-                <v-icon>mdi-test-tube</v-icon>
+              <v-btn v-bind="props" icon variant="text" size="small" class="tool-btn" color="secondary">
+                <v-icon size="20">mdi-dots-vertical</v-icon>
               </v-btn>
             </template>
-            <div class="brutalist-menu">
-              <router-link to="/test" class="menu-item">COMPONENTS</router-link>
-              <router-link to="/folder-test" class="menu-item">FOLDERS</router-link>
-            </div>
+            <v-list density="compact" class="util-menu rounded-lg mt-2" elevation="4">
+              <v-list-item to="/test" prepend-icon="mdi-test-tube" class="menu-item">
+                <v-list-item-title class="text-body-2">Component Test</v-list-item-title>
+              </v-list-item>
+              <v-list-item to="/folder-test" prepend-icon="mdi-folder-search-outline" class="menu-item">
+                <v-list-item-title class="text-body-2">Folder Test</v-list-item-title>
+              </v-list-item>
+            </v-list>
           </v-menu>
         </div>
       </div>
     </header>
 
-    <v-main class="main-content pt-16">
-      <div class="content-wrapper">
+    <v-main class="main-content pt-14">
+      <div class="content-wrapper mx-auto">
         <router-view #default="{ Component, route }">
-          <transition name="hard-cut" mode="out-in">
+          <transition name="fade" mode="out-in">
             <keep-alive>
               <component v-if="route.meta.keepAlive" :is="Component" :key="route.fullPath" />
             </keep-alive>
           </transition>
-          <transition name="hard-cut" mode="out-in">
+          <transition name="fade" mode="out-in">
             <component v-if="!route.meta.keepAlive" :is="Component" />
           </transition>
         </router-view>
@@ -153,203 +161,118 @@ const onScroll = (event: Event) => {
   min-height: 100vh;
 }
 
-/* Brutalist Header */
-.brutalist-header {
+/* Utilitarian Header */
+.util-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  background-color: rgb(var(--v-theme-background));
-  border-bottom: 2px solid rgb(var(--v-theme-border-color));
-  transition: transform 0.2s ease;
+  background-color: rgba(var(--v-theme-surface), 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgb(var(--v-theme-border-color));
+  transition: all 0.2s ease;
+  height: 56px;
 
   &.scrolled {
-    transform: translateY(-100%); /* Hide on scroll down for brutalism */
-    
-    &:hover {
-      transform: translateY(0); /* Show on hover */
-    }
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 }
 
-.header-grid {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  height: 64px;
+.header-content {
+  height: 100%;
+  max-width: 1400px;
 }
 
-.header-cell {
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  border-right: 2px solid rgb(var(--v-theme-border-color));
-
-  &:last-child {
-    border-right: none;
-  }
-}
-
-/* Logo */
-.logo-cell {
-  cursor: pointer;
-  background-color: rgb(var(--v-theme-accent));
-  color: rgb(var(--v-theme-on-surface));
-  gap: 8px;
-  transition: filter 0.1s;
-
+.logo-area {
+  transition: opacity 0.2s;
+  
   &:hover {
-    filter: invert(100%);
+    opacity: 0.8;
   }
 }
 
 .logo-text {
-  font-family: 'Space Mono', monospace;
-  font-weight: 700;
-  font-size: 1.5rem;
-  letter-spacing: -1px;
+  font-size: 1.25rem;
+  letter-spacing: -0.5px;
+  color: rgb(var(--v-theme-primary));
 }
 
-.logo-badge {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.6rem;
-  border: 1px solid currentColor;
-  padding: 2px 4px;
-  line-height: 1;
-}
-
-/* Navigation */
-.nav-cell {
-  gap: 0;
-  padding: 0;
+.nav-area {
+  gap: 8px;
 }
 
 .nav-link {
   display: flex;
-  align-items: baseline;
-  height: 100%;
-  padding: 0 32px;
-  color: rgb(var(--v-theme-on-surface));
+  align-items: center;
+  padding: 6px 12px;
+  color: rgb(var(--v-theme-secondary));
   text-decoration: none;
-  border-right: 2px solid rgb(var(--v-theme-border-color));
-  transition: all 0.1s;
-  position: relative;
-  overflow: hidden;
-
-  .link-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    margin-right: 8px;
-    opacity: 0.5;
-  }
-
-  .link-text {
-    font-family: 'Space Mono', monospace;
-    font-weight: 700;
-    font-size: 1rem;
-    letter-spacing: 1px;
-    align-self: center;
-  }
-
-  .fav-count {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.8rem;
-    margin-left: 8px;
-    color: rgb(var(--v-theme-accent));
-    font-weight: 700;
-    align-self: center;
-  }
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.15s ease;
 
   &:hover {
-    background-color: rgb(var(--v-theme-on-surface));
-    color: rgb(var(--v-theme-background));
-
-    .link-num { opacity: 1; }
+    color: rgb(var(--v-theme-primary));
+    background-color: rgba(var(--v-theme-primary), 0.05);
   }
 
   &.active {
-    background-color: rgb(var(--v-theme-accent));
-    color: rgb(var(--v-theme-on-surface));
-    
-    .link-num { color: rgb(var(--v-theme-on-surface)); opacity: 1; }
-    .fav-count { color: rgb(var(--v-theme-on-surface)); }
+    color: rgb(var(--v-theme-primary));
+    background-color: rgba(var(--v-theme-primary), 0.08);
   }
 }
 
-/* Tools */
-.tools-cell {
-  gap: 8px;
+.divider-vertical {
+  width: 1px;
+  height: 24px;
+  background-color: rgb(var(--v-theme-border-color));
 }
 
 .tool-btn {
-  border-radius: 0 !important;
-  border: 2px solid transparent;
+  transition: all 0.15s ease;
   
   &:hover {
-    background-color: transparent !important;
-    border-color: rgb(var(--v-theme-on-surface));
-    transform: translate(2px, -2px);
-    box-shadow: -2px 2px 0 rgb(var(--v-theme-accent));
+    color: rgb(var(--v-theme-primary)) !important;
+    background-color: rgba(var(--v-theme-primary), 0.05);
   }
 }
 
-.brutalist-menu {
-  background: rgb(var(--v-theme-background));
-  border: 2px solid rgb(var(--v-theme-border-color));
-  box-shadow: 8px 8px 0 rgba(var(--v-theme-accent), 1);
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-  margin-top: 8px;
-}
-
-.menu-item {
-  padding: 16px 24px;
-  font-family: 'Space Mono', monospace;
-  font-weight: 700;
-  color: rgb(var(--v-theme-on-surface));
-  text-decoration: none;
-  border-bottom: 2px solid rgb(var(--v-theme-border-color));
-  transition: all 0.1s;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:hover {
-    background: rgb(var(--v-theme-accent));
-    padding-left: 32px;
+.util-menu {
+  border: 1px solid rgb(var(--v-theme-border-color));
+  background: rgb(var(--v-theme-surface));
+  
+  .menu-item {
+    transition: background-color 0.15s;
+    
+    &:hover {
+      background-color: rgba(var(--v-theme-primary), 0.05);
+    }
   }
 }
 
-/* Content Layout */
 .main-content {
   min-height: 100vh;
 }
 
 .content-wrapper {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 48px 24px;
+  max-width: 1200px;
+  padding: 32px 24px;
 }
 
-/* Hard Cut Transitions */
-.hard-cut-enter-active,
-.hard-cut-leave-active {
-  transition: opacity 0.1s;
+/* Fade Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
 }
-.hard-cut-enter-from,
-.hard-cut-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 
 @media (max-width: 960px) {
-  .header-grid {
-    grid-template-columns: auto 1fr;
-  }
-  .nav-cell {
-    display: none !important;
-  }
   .content-wrapper {
     padding: 24px 16px;
   }

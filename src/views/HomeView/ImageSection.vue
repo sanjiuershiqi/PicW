@@ -5,21 +5,21 @@
         <v-col cols="12" sm="4" class="image-col border-r">
           <v-hover #default="{ isHovering, props }">
             <v-img v-bind="props" :src="blob2Url" height="100%" min-height="200" cover class="preview-img">
-              <v-overlay :model-value="isHovering" contained class="align-center justify-center brutalist-overlay">
-                <v-btn color="primary" variant="flat" icon="mdi-delete" @click="delEvent" size="large" class="delete-btn rounded-0"></v-btn>
+              <v-overlay :model-value="isHovering" contained class="align-center justify-center util-overlay">
+                <v-btn color="white" variant="flat" icon="mdi-delete" @click="delEvent" size="small" class="delete-btn"></v-btn>
               </v-overlay>
-              <div class="filesize-badge font-mono">{{ filesize(props.filesize) }}</div>
+              <div class="filesize-badge">{{ filesize(props.filesize) }}</div>
             </v-img>
           </v-hover>
         </v-col>
         <v-col cols="12" sm="8" class="content-col d-flex flex-column">
           <div class="pa-5 flex-grow-1 border-b">
             <div class="d-flex align-start mb-4">
-              <h3 class="text-h6 font-weight-bold mb-0 editable-filename" contenteditable @keyup="keyUp" spellcheck="false">
+              <h3 class="text-subtitle-1 font-weight-medium mb-0 editable-filename" contenteditable @keyup="keyUp" spellcheck="false">
                 {{ filename }}
               </h3>
               <v-spacer></v-spacer>
-              <v-icon icon="mdi-pencil" size="small" color="primary"></v-icon>
+              <v-icon icon="mdi-pencil" size="small" color="secondary"></v-icon>
             </div>
             
             <div class="links-container">
@@ -28,18 +28,18 @@
           </div>
           
           <div class="pa-4 bg-surface-variant d-flex justify-space-between align-center" v-show="!uploaded">
-            <span class="font-mono text-caption text-uppercase">Status: Pending</span>
+            <span class="text-caption text-secondary">Ready to upload</span>
             <v-btn 
               variant="flat" 
-              color="accent" 
-              class="px-6 upload-btn font-mono" 
+              color="primary" 
+              class="px-6" 
               @click="uploadImage" 
               :loading="uploading"
             >
-              INITIATE_UPLOAD
+              Upload
               <template #loader>
                 <div class="d-flex align-center">
-                  <span class="mr-2">[{{ progress }}%]</span>
+                  <span class="mr-2">{{ progress }}%</span>
                 </div>
               </template>
             </v-btn>
@@ -146,58 +146,52 @@ const uploadImage = async () => {
 .image-section-card {
   transition: all 0.2s;
   background: rgb(var(--v-theme-surface));
-  border: 2px solid rgb(var(--v-theme-primary));
+  border: 1px solid rgb(var(--v-theme-border-color));
   
   &:hover {
-    box-shadow: 6px 6px 0 rgb(var(--v-theme-accent));
-    transform: translate(-2px, -2px);
+    border-color: rgba(var(--v-theme-primary), 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 }
 
 .border-r {
-  border-right: 2px solid rgb(var(--v-theme-primary));
+  border-right: 1px solid rgb(var(--v-theme-border-color));
 }
 
 .border-b {
-  border-bottom: 2px solid rgb(var(--v-theme-primary));
+  border-bottom: 1px solid rgb(var(--v-theme-border-color));
 }
 
 .preview-img {
   position: relative;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(var(--v-theme-primary), 0.05),
-    rgba(var(--v-theme-primary), 0.05) 10px,
-    transparent 10px,
-    transparent 20px
-  );
+  background: rgb(var(--v-theme-surface-variant));
 }
 
-.brutalist-overlay {
-  background: rgba(var(--v-theme-accent), 0.8) !important;
-  backdrop-filter: grayscale(100%) contrast(200%);
+.util-overlay {
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(2px);
 }
 
 .delete-btn {
-  border: 2px solid rgb(var(--v-theme-primary));
-  transition: all 0.1s;
+  transition: all 0.15s;
   
   &:hover {
-    transform: scale(1.1) rotate(-5deg);
-    background: rgb(var(--v-theme-surface)) !important;
-    color: rgb(var(--v-theme-accent)) !important;
+    transform: scale(1.05);
+    background: rgb(var(--v-theme-error)) !important;
   }
 }
 
 .filesize-badge {
   position: absolute;
-  top: 0;
-  left: 0;
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
-  padding: 4px 8px;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
   z-index: 2;
 }
 
@@ -210,19 +204,20 @@ const uploadImage = async () => {
   cursor: text;
   padding: 4px 8px;
   margin: -4px -8px;
-  border: 2px solid transparent;
-  transition: all 0.1s;
-  font-family: var(--font-mono);
-  font-size: 1.1rem !important;
-  letter-spacing: -0.5px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.15s;
+  font-size: 0.95rem !important;
+  line-height: 1.4;
   
   &:hover {
-    background: rgba(var(--v-theme-primary), 0.05);
+    background: rgba(var(--v-theme-primary), 0.04);
   }
   
   &:focus {
     background: rgb(var(--v-theme-surface));
-    border-color: rgb(var(--v-theme-accent));
+    border-color: rgba(var(--v-theme-primary), 0.2);
+    box-shadow: 0 0 0 2px rgba(var(--v-theme-primary), 0.1);
   }
 }
 
@@ -232,23 +227,6 @@ const uploadImage = async () => {
   gap: 8px;
 }
 
-.upload-btn {
-  font-weight: 700;
-  letter-spacing: 1px;
-  border: 2px solid rgb(var(--v-theme-primary));
-  transition: all 0.1s;
-  
-  &:hover {
-    transform: translate(2px, 2px);
-    box-shadow: -2px -2px 0 rgb(var(--v-theme-primary));
-  }
-  
-  &:active {
-    transform: translate(4px, 4px);
-    box-shadow: none;
-  }
-}
-
 // 响应式
 @media (max-width: 600px) {
   .preview-img {
@@ -256,7 +234,7 @@ const uploadImage = async () => {
   }
   .border-r {
     border-right: none;
-    border-bottom: 2px solid rgb(var(--v-theme-primary));
+    border-bottom: 1px solid rgb(var(--v-theme-border-color));
   }
 }
 </style>
