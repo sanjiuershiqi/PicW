@@ -1,54 +1,66 @@
 <template>
-  <v-app @contextmenu.prevent v-scroll="onScroll">
-    <v-app-bar :elevation="atTop ? 0 : 3" class="header">
-      <!-- 主题切换 -->
-      <v-btn :icon="getThemeIcon" @click="toggleTheme" variant="text" />
+  <v-app @contextmenu.prevent v-scroll="onScroll" class="app-container">
+    <v-app-bar
+      :elevation="0"
+      class="header"
+      :class="{ 'header-scrolled': !atTop }"
+    >
+      <div class="header-content mx-auto w-100 px-4 d-flex align-center" style="max-width: 1400px;">
+        <!-- 主题切换 -->
+        <v-btn :icon="getThemeIcon" @click="toggleTheme" variant="text" class="theme-btn" />
 
-      <!-- 标题 -->
-      <v-app-bar-title class="font-weight-bold">
-        <span @click="$router.push('/')" class="home">PicW</span>
-      </v-app-bar-title>
+        <!-- 标题 -->
+        <v-app-bar-title class="font-weight-bold mx-4">
+          <span @click="$router.push('/')" class="home logo-text">Pic<span class="text-accent">W</span></span>
+        </v-app-bar-title>
 
-      <v-spacer />
+        <v-spacer />
 
-      <!-- 导航按钮 -->
-      <v-btn to="/images" variant="text" prepend-icon="mdi-image-search-outline">
-        <span class="d-none d-sm-inline">图片管理</span>
-      </v-btn>
+        <!-- 导航按钮 -->
+        <div class="nav-links d-none d-md-flex align-center">
+          <v-btn to="/images" variant="text" class="nav-btn" rounded="pill">
+            <v-icon start icon="mdi-image-search-outline"></v-icon>
+            图片管理
+          </v-btn>
 
-      <v-btn to="/favorites" variant="text" prepend-icon="mdi-star">
-        <span class="d-none d-sm-inline">我的收藏</span>
-        <v-badge v-if="favoriteCount > 0" :content="favoriteCount" color="warning" inline />
-      </v-btn>
+          <v-btn to="/favorites" variant="text" class="nav-btn" rounded="pill">
+            <v-icon start icon="mdi-star"></v-icon>
+            我的收藏
+            <v-badge v-if="favoriteCount > 0" :content="favoriteCount" color="accent" inline class="ms-1" />
+          </v-btn>
+        </div>
 
-      <v-btn to="/setting" icon="mdi-cog-outline" variant="text" />
+        <v-btn to="/setting" icon="mdi-cog-outline" variant="text" class="ms-2 icon-btn" />
 
-      <!-- 测试菜单 -->
-      <v-menu>
-        <template #activator="{ props }">
-          <v-btn v-bind="props" icon="mdi-test-tube" variant="text" />
-        </template>
-        <v-list density="compact">
-          <v-list-item to="/test" prepend-icon="mdi-test-tube">
-            <v-list-item-title>组件测试</v-list-item-title>
-          </v-list-item>
-          <v-list-item to="/folder-test" prepend-icon="mdi-folder-search">
-            <v-list-item-title>文件夹测试</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+        <!-- 测试菜单 -->
+        <v-menu transition="slide-y-transition">
+          <template #activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-test-tube" variant="text" class="icon-btn" />
+          </template>
+          <v-list density="compact" class="rounded-xl mt-2 elevation-4" bg-color="surface">
+            <v-list-item to="/test" prepend-icon="mdi-test-tube" class="rounded-lg mx-2 mb-1">
+              <v-list-item-title>组件测试</v-list-item-title>
+            </v-list-item>
+            <v-list-item to="/folder-test" prepend-icon="mdi-folder-search" class="rounded-lg mx-2">
+              <v-list-item-title>文件夹测试</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
     </v-app-bar>
-    <v-main>
-      <router-view #default="{ Component, route }">
-        <transition name="router-transition">
-          <keep-alive>
-            <component v-if="route.meta.keepAlive" :is="Component" :key="route.fullPath" />
-          </keep-alive>
-        </transition>
-        <transition name="router-transition">
-          <component v-if="!route.meta.keepAlive" :is="Component" />
-        </transition>
-      </router-view>
+    <v-main class="main-content">
+      <div class="content-wrapper mx-auto" style="max-width: 1400px; padding: 24px;">
+        <router-view #default="{ Component, route }">
+          <transition name="page-fade" mode="out-in">
+            <keep-alive>
+              <component v-if="route.meta.keepAlive" :is="Component" :key="route.fullPath" />
+            </keep-alive>
+          </transition>
+          <transition name="page-fade" mode="out-in">
+            <component v-if="!route.meta.keepAlive" :is="Component" />
+          </transition>
+        </router-view>
+      </div>
     </v-main>
     <SnackBar />
   </v-app>
@@ -137,60 +149,88 @@ const onScroll = (event: Event) => {
 </script>
 
 <style scoped lang="scss">
-.header {
-  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+.app-container {
+  background-color: rgb(var(--v-theme-background));
 }
 
-.home {
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.3s;
+.header {
+  background-color: rgba(var(--v-theme-surface), 0.7) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(var(--v-border-color), 0.05);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
-  &:hover {
-    transform: scale(1.05);
+  &.header-scrolled {
+    background-color: rgba(var(--v-theme-surface), 0.85) !important;
+    border-bottom: 1px solid rgba(var(--v-border-color), 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
   }
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.logo-text {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.text-accent {
+  color: rgb(var(--v-theme-accent));
 }
 
 .nav-btn {
-  text-transform: none;
-  letter-spacing: normal;
-
-  &:hover {
-    background-color: rgba(var(--v-theme-primary), 0.08);
-  }
-}
-
-.nav-btn-icon {
-  &:hover {
-    background-color: rgba(var(--v-theme-primary), 0.08);
-    transform: scale(1.1);
-  }
-
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  margin: 0 4px;
+  padding: 0 16px;
+  opacity: 0.8;
   transition: all 0.2s;
+
+  &:hover {
+    opacity: 1;
+    background-color: rgba(var(--v-theme-on-surface), 0.04);
+  }
+
+  &.v-btn--active {
+    opacity: 1;
+    background-color: rgba(var(--v-theme-on-surface), 0.08);
+  }
 }
 
-.gap-2 {
-  gap: 8px;
+.icon-btn, .theme-btn {
+  opacity: 0.7;
+  transition: all 0.2s;
+  
+  &:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    background-color: rgba(var(--v-theme-on-surface), 0.04);
+  }
+}
+
+/* Page Transitions */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 // 响应式调整
 @media (max-width: 600px) {
-  .header {
-    .v-avatar {
-      display: none;
-    }
-
-    .v-divider {
-      display: none;
-    }
+  .content-wrapper {
+    padding: 16px !important;
   }
 }
 </style>

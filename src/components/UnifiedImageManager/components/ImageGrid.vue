@@ -14,24 +14,25 @@
       <v-list-item
         v-for="image in images"
         :key="image.sha"
+        class="list-item-modern"
         :class="{ 'selected-item': selectedImages.includes(image.sha) }"
         @click="handleSelect(image)"
       >
         <template #prepend>
-          <v-avatar size="60" rounded="lg">
+          <v-avatar size="60" rounded="lg" class="elevation-2">
             <v-img :src="getImageUrl(image)" :alt="image.name" cover @error="e => handleImageError(e, image)">
               <template #placeholder>
-                <v-progress-circular indeterminate size="20" />
+                <v-progress-circular indeterminate size="20" color="accent" />
               </template>
               <template #error>
-                <v-icon>mdi-image-broken</v-icon>
+                <v-icon color="medium-emphasis">mdi-image-broken-variant</v-icon>
               </template>
             </v-img>
           </v-avatar>
         </template>
 
-        <v-list-item-title>{{ image.name }}</v-list-item-title>
-        <v-list-item-subtitle>
+        <v-list-item-title class="image-name">{{ image.name }}</v-list-item-title>
+        <v-list-item-subtitle class="text-medium-emphasis">
           {{ formatFileSize(image.size) }}
         </v-list-item-subtitle>
 
@@ -39,12 +40,13 @@
           <v-btn
             :icon="favoritesStore.isFavorite(image.sha) ? 'mdi-star' : 'mdi-star-outline'"
             size="small"
-            :color="favoritesStore.isFavorite(image.sha) ? 'warning' : 'default'"
+            :color="favoritesStore.isFavorite(image.sha) ? 'accent' : 'medium-emphasis'"
             variant="text"
+            class="mr-1"
             @click.stop="handleToggleFavorite(image)"
           />
-          <v-btn icon="mdi-eye" size="small" variant="text" @click.stop="emit('preview', image)" />
-          <v-checkbox-btn :model-value="selectedImages.includes(image.sha)" @click.stop="handleSelect(image)" />
+          <v-btn icon="mdi-eye-outline" size="small" variant="text" color="medium-emphasis" class="mr-2" @click.stop="emit('preview', image)" />
+          <v-checkbox-btn :model-value="selectedImages.includes(image.sha)" color="accent" @click.stop="handleSelect(image)" />
         </template>
       </v-list-item>
     </v-list>
@@ -52,33 +54,35 @@
     <!-- 网格视图（图片数量较少时） -->
     <v-row v-else>
       <v-col v-for="image in images" :key="image.sha" cols="12" sm="6" md="4" lg="3">
-        <v-card hover :class="{ 'selected-card': selectedImages.includes(image.sha) }" @click="handleSelect(image)">
-          <v-img
-            :src="getImageUrl(image)"
-            :lazy-src="getPlaceholderUrl(image)"
-            :alt="image.name"
-            aspect-ratio="1"
-            cover
-            loading="lazy"
-            class="image-preview"
-            @error="e => handleImageError(e, image)"
-          >
-            <template #placeholder>
-              <v-row class="fill-height ma-0" align="center" justify="center">
-                <v-progress-circular indeterminate color="grey-lighten-5" />
-              </v-row>
-            </template>
-            <template #error>
-              <v-row class="fill-height ma-0" align="center" justify="center">
-                <v-icon size="48" color="grey">mdi-image-broken</v-icon>
-              </v-row>
-            </template>
-          </v-img>
+        <v-card class="image-card" :class="{ 'selected-card': selectedImages.includes(image.sha) }" @click="handleSelect(image)" elevation="0">
+          <div class="overflow-hidden">
+            <v-img
+              :src="getImageUrl(image)"
+              :lazy-src="getPlaceholderUrl(image)"
+              :alt="image.name"
+              aspect-ratio="1"
+              cover
+              loading="lazy"
+              class="image-preview"
+              @error="e => handleImageError(e, image)"
+            >
+              <template #placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular indeterminate color="accent" />
+                </v-row>
+              </template>
+              <template #error>
+                <v-row class="fill-height ma-0 bg-surface-variant" align="center" justify="center">
+                  <v-icon size="48" color="medium-emphasis">mdi-image-broken-variant</v-icon>
+                </v-row>
+              </template>
+            </v-img>
+          </div>
 
-          <v-card-actions class="pa-2">
-            <v-tooltip location="top">
+          <v-card-actions class="pa-3 image-actions">
+            <v-tooltip location="top" open-delay="300">
               <template #activator="{ props }">
-                <div v-bind="props" class="text-truncate text-caption flex-grow-1">
+                <div v-bind="props" class="text-truncate image-name text-body-2 flex-grow-1">
                   {{ image.name }}
                 </div>
               </template>
@@ -88,16 +92,16 @@
             <v-btn
               :icon="favoritesStore.isFavorite(image.sha) ? 'mdi-star' : 'mdi-star-outline'"
               size="small"
-              :color="favoritesStore.isFavorite(image.sha) ? 'warning' : 'default'"
+              :color="favoritesStore.isFavorite(image.sha) ? 'accent' : 'medium-emphasis'"
               variant="text"
               @click.stop="handleToggleFavorite(image)"
             />
-            <v-btn icon="mdi-eye" size="small" variant="text" @click.stop="emit('preview', image)" />
+            <v-btn icon="mdi-eye-outline" size="small" variant="text" color="medium-emphasis" @click.stop="emit('preview', image)" />
           </v-card-actions>
 
           <!-- 选中标记 -->
-          <v-overlay v-if="selectedImages.includes(image.sha)" contained class="align-center justify-center" scrim="primary" opacity="0.3">
-            <v-icon size="48" color="white">mdi-check-circle</v-icon>
+          <v-overlay v-if="selectedImages.includes(image.sha)" contained class="align-center justify-center selected-overlay" opacity="1">
+            <v-icon size="48" color="accent" class="elevation-4 rounded-circle bg-surface">mdi-check-circle</v-icon>
           </v-overlay>
         </v-card>
       </v-col>
@@ -253,27 +257,72 @@ const formatFileSize = (bytes: number): string => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .selected-card {
-  border: 2px solid rgb(var(--v-theme-primary));
+  border-color: rgb(var(--v-theme-accent)) !important;
+  box-shadow: 0 0 0 2px rgb(var(--v-theme-accent)) !important;
+  transform: translateY(-4px);
+}
+
+.image-card {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(var(--v-theme-surface), 0.6);
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    border-color: rgba(var(--v-theme-accent), 0.3);
+  }
 }
 
 .image-preview {
   cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  .image-card:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.image-actions {
+  background: rgba(var(--v-theme-surface), 0.85);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.05);
+}
+
+.image-name {
+  font-weight: 500;
+  letter-spacing: -0.2px;
 }
 
 .image-list {
+  background: transparent;
+  
   .selected-item {
-    background-color: rgba(var(--v-theme-primary), 0.1);
-    border-left: 4px solid rgb(var(--v-theme-primary));
+    background-color: rgba(var(--v-theme-accent), 0.05) !important;
+    border-left: 4px solid rgb(var(--v-theme-accent));
   }
 
-  .v-list-item {
-    border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  .list-item-modern {
+    margin-bottom: 8px;
+    border-radius: 16px;
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.05);
+    background: rgba(var(--v-theme-surface), 0.6);
+    transition: all 0.3s;
 
     &:hover {
-      background-color: rgba(var(--v-theme-on-surface), 0.04);
+      background-color: rgba(var(--v-theme-surface), 1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transform: translateX(4px);
     }
   }
+}
+
+.selected-overlay {
+  backdrop-filter: blur(2px);
+  background: rgba(var(--v-theme-accent), 0.15) !important;
 }
 </style>

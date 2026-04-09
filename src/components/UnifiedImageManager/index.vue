@@ -427,6 +427,6 @@ onMounted(() => {
 
 <style scoped>
 .unified-image-manager {
-  padding-bottom: 80px; /* 为批量操作栏留出空间 */
+  padding-bottom: 120px; /* 为批量操作栏留出更多空间 */
 }
 </style>
