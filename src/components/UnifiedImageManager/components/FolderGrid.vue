@@ -3,12 +3,7 @@
     <!-- 列表视图 -->
     <v-card v-if="viewMode === 'list'" variant="flat" class="folder-list bg-transparent mb-4">
       <v-list lines="two" class="bg-transparent pa-0">
-        <v-list-item
-          v-for="(folder, index) in folders"
-          :key="folder.path"
-          @click="$emit('navigate', folder.path)"
-          class="folder-list-item"
-        >
+        <v-list-item v-for="folder in folders" :key="folder.path" @click="$emit('navigate', folder.path)" class="folder-list-item">
           <template #prepend>
             <div class="folder-icon-wrapper elevation-1">
               <v-icon size="28" color="accent">mdi-folder-open-outline</v-icon>
@@ -18,12 +13,16 @@
           <v-list-item-title class="text-subtitle-1 font-weight-bold mb-1 folder-name">
             {{ folder.name }}
           </v-list-item-title>
-          <v-list-item-subtitle class="text-caption text-medium-emphasis">
-            Folder
-          </v-list-item-subtitle>
+          <v-list-item-subtitle class="text-caption text-medium-emphasis"> Folder </v-list-item-subtitle>
 
           <template #append>
-            <v-btn icon="mdi-chevron-right" variant="text" color="medium-emphasis" size="small" @click.stop="$emit('navigate', folder.path)" />
+            <v-btn
+              icon="mdi-chevron-right"
+              variant="text"
+              color="medium-emphasis"
+              size="small"
+              @click.stop="$emit('navigate', folder.path)"
+            />
           </template>
         </v-list-item>
       </v-list>
@@ -41,9 +40,7 @@
               <div class="text-subtitle-1 font-weight-bold mb-1 text-truncate folder-name">
                 {{ folder.name }}
               </div>
-              <div class="text-caption text-medium-emphasis d-flex align-center">
-                Folder
-              </div>
+              <div class="text-caption text-medium-emphasis d-flex align-center">Folder</div>
             </div>
             <v-spacer></v-spacer>
             <v-icon color="medium-emphasis" size="small" class="chevron-icon">mdi-chevron-right</v-icon>
@@ -102,11 +99,11 @@ defineEmits<{
       transform: translateX(4px);
       color: rgb(var(--v-theme-accent)) !important;
     }
-    
+
     .folder-icon-wrapper {
       background: rgba(var(--v-theme-accent), 0.1);
       transform: scale(1.05);
-      
+
       .v-icon {
         color: rgb(var(--v-theme-accent)) !important;
       }
@@ -124,7 +121,7 @@ defineEmits<{
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  
+
   .v-theme--dark & {
     background: rgba(255, 255, 255, 0.05);
   }
@@ -133,7 +130,7 @@ defineEmits<{
 .folder-name {
   letter-spacing: -0.2px;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-  
+
   .v-theme--dark & {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   }
@@ -145,7 +142,7 @@ defineEmits<{
 
 .folder-list {
   background: transparent !important;
-  
+
   .folder-list-item {
     cursor: pointer;
     margin-bottom: 8px;
@@ -176,7 +173,7 @@ defineEmits<{
       .folder-icon-wrapper {
         background: rgba(var(--v-theme-accent), 0.1);
         transform: scale(1.05);
-        
+
         .v-icon {
           color: rgb(var(--v-theme-accent)) !important;
         }

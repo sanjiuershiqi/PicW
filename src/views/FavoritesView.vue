@@ -1,29 +1,43 @@
 <template>
   <v-container fluid class="favorites-view">
     <!-- 页面头部 -->
-    <v-card variant="flat" class="header-card mb-6">
-      <v-card-text class="d-flex align-center pa-4">
+    <v-card class="header-card mb-6 glass-panel" elevation="0">
+      <v-card-text class="d-flex align-center pa-6">
         <!-- 左侧：标题和统计信息 -->
         <div class="d-flex align-center flex-grow-1">
-          <v-avatar color="warning" size="48" class="me-4">
-            <v-icon size="28">mdi-star</v-icon>
-          </v-avatar>
+          <div class="header-icon-wrapper mr-5">
+            <v-icon size="32" color="warning">mdi-star</v-icon>
+            <div class="icon-glow" style="background: radial-gradient(circle, rgba(var(--v-theme-warning), 0.3) 0%, transparent 70%)"></div>
+          </div>
           <div>
-            <h1 class="text-h5 font-weight-bold mb-1">我的收藏</h1>
-            <div class="d-flex align-center text-body-2 text-medium-emphasis">
-              <v-icon size="16" class="me-1">mdi-image-multiple</v-icon>
-              <span>共 {{ favoriteCount }} 张图片 • {{ totalSize }}</span>
+            <h1 class="text-h4 font-weight-bold mb-1 header-title">我的收藏</h1>
+            <div class="d-flex align-center text-body-1 text-secondary">
+              <v-icon size="18" class="mr-2">mdi-image-multiple</v-icon>
+              <span class="font-mono text-uppercase tracking-wider">共 {{ favoriteCount }} 张图片 • {{ totalSize }}</span>
             </div>
           </div>
         </div>
 
         <!-- 右侧：操作按钮 -->
-        <div class="d-flex align-center gap-2">
-          <v-btn variant="outlined" prepend-icon="mdi-export" @click="exportFavorites" :disabled="favoriteCount === 0"> 导出 </v-btn>
-          <v-btn variant="outlined" prepend-icon="mdi-import" @click="triggerImport"> 导入 </v-btn>
+        <div class="d-flex align-center gap-3">
           <v-btn
-            variant="outlined"
+            class="glass-btn px-6 transition-all"
+            rounded="pill"
+            elevation="0"
+            prepend-icon="mdi-export"
+            @click="exportFavorites"
+            :disabled="favoriteCount === 0"
+          >
+            导出
+          </v-btn>
+          <v-btn class="glass-btn px-6 transition-all" rounded="pill" elevation="0" prepend-icon="mdi-import" @click="triggerImport">
+            导入
+          </v-btn>
+          <v-btn
+            class="glass-btn px-6 transition-all"
             color="error"
+            rounded="pill"
+            elevation="0"
             prepend-icon="mdi-delete-sweep"
             @click="showClearDialog = true"
             :disabled="favoriteCount === 0"
@@ -40,27 +54,49 @@
     <!-- 收藏图片管理器 -->
     <template v-else>
       <!-- 工具栏 -->
-      <v-card variant="flat" class="toolbar-card mb-4">
-        <v-card-text class="pa-3">
+      <v-card class="toolbar-card mb-6 glass-panel" elevation="0">
+        <v-card-text class="pa-4">
           <div class="d-flex align-center">
             <!-- 左侧：筛选和排序 -->
-            <div class="d-flex align-center gap-2 flex-grow-1">
-              <v-select
-                v-model="sortBy"
-                :items="sortOptions"
-                density="compact"
-                variant="outlined"
-                hide-details
-                style="max-width: 200px"
-                prepend-inner-icon="mdi-sort"
-              />
+            <div class="d-flex align-center gap-3 flex-grow-1">
+              <div class="glass-select-wrapper">
+                <v-select
+                  v-model="sortBy"
+                  :items="sortOptions"
+                  density="compact"
+                  variant="plain"
+                  hide-details
+                  style="min-width: 140px; max-width: 200px"
+                  prepend-inner-icon="mdi-sort"
+                  class="glass-select"
+                  :menu-props="{ contentClass: 'glass-select-menu', offset: 8 }"
+                />
+              </div>
             </div>
 
             <!-- 右侧：视图切换 -->
-            <v-btn-toggle v-model="viewMode" variant="outlined" density="compact" mandatory>
-              <v-btn value="grid" icon="mdi-view-grid" title="网格视图" />
-              <v-btn value="list" icon="mdi-view-list" title="列表视图" />
-            </v-btn-toggle>
+            <div class="view-toggle d-flex rounded-pill glass-panel p-1">
+              <v-btn
+                :color="viewMode === 'grid' ? 'primary' : 'transparent'"
+                :class="{ 'elevation-2': viewMode === 'grid' }"
+                size="small"
+                rounded="pill"
+                class="view-btn px-4"
+                @click="viewMode = 'grid'"
+              >
+                <v-icon size="small" :color="viewMode === 'grid' ? 'on-primary' : 'primary'">mdi-view-grid</v-icon>
+              </v-btn>
+              <v-btn
+                :color="viewMode === 'list' ? 'primary' : 'transparent'"
+                :class="{ 'elevation-2': viewMode === 'list' }"
+                size="small"
+                rounded="pill"
+                class="view-btn px-4"
+                @click="viewMode = 'list'"
+              >
+                <v-icon size="small" :color="viewMode === 'list' ? 'on-primary' : 'primary'">mdi-view-list</v-icon>
+              </v-btn>
+            </div>
           </div>
         </v-card-text>
       </v-card>
@@ -351,88 +387,227 @@ const getPlaceholderUrl = () => {
 
 <style scoped lang="scss">
 .favorites-view {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 24px;
+  min-height: calc(100vh - 64px);
 }
 
 .header-card {
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(var(--v-theme-surface), 0.8) 0%, rgba(var(--v-theme-surface), 1) 100%);
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  }
 }
 
-.toolbar-card {
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 8px;
+.header-title {
+  letter-spacing: -0.5px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+
+  .v-theme--dark & {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
 }
 
-.gap-2 {
-  gap: 8px;
+.header-icon-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--v-theme-warning), 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(var(--v-theme-warning), 0.2);
+
+  .icon-glow {
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    z-index: 0;
+    filter: blur(8px);
+    pointer-events: none;
+  }
+
+  .v-icon {
+    z-index: 1;
+    text-shadow: 0 2px 8px rgba(var(--v-theme-warning), 0.4);
+  }
+}
+
+.glass-btn {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  color: rgb(var(--v-theme-on-surface));
+  font-weight: 600;
+
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    color: rgb(var(--v-theme-primary));
+
+    .v-theme--dark & {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  &.bg-error:hover {
+    color: white !important;
+    background: rgb(var(--v-theme-error)) !important;
+  }
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 24px !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+
+  .v-theme--dark & {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.glass-select-wrapper {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .v-theme--dark & {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background: rgba(15, 23, 42, 0.5) !important;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.glass-select {
+  :deep(.v-field__input) {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgb(var(--v-theme-primary));
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    padding-top: 8px;
+    padding-bottom: 8px;
+
+    .v-theme--dark & {
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  :deep(.v-field__append-inner) {
+    color: rgb(var(--v-theme-primary));
+    opacity: 0.8;
+  }
+
+  :deep(.v-field__prepend-inner) {
+    color: rgb(var(--v-theme-primary));
+    opacity: 0.8;
+  }
+}
+
+.view-btn {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover:not(.bg-primary) {
+    background: rgba(255, 255, 255, 0.5) !important;
+
+    .v-theme--dark & {
+      background: rgba(0, 0, 0, 0.3) !important;
+    }
+  }
 }
 
 .favorite-card {
-  cursor: pointer;
-  transition: all 0.2s ease;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 24px !important;
+  position: relative;
+
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    border-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.4) !important;
+
+    .v-theme--dark & {
+      background: rgba(15, 23, 42, 0.5) !important;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
   }
 }
 
 .image-preview {
-  cursor: pointer;
+  background-color: transparent !important;
 }
 
-.image-list {
-  .v-list-item {
-    border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+.favorite-list {
+  background: transparent !important;
+
+  .list-item-modern {
+    margin-bottom: 8px;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 8px 16px;
+
+    .v-theme--dark & {
+      background: rgba(15, 23, 42, 0.3) !important;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
 
     &:hover {
-      background-color: rgba(var(--v-theme-on-surface), 0.04);
-    }
-  }
-}
+      background-color: rgba(255, 255, 255, 0.5) !important;
+      transform: translateX(4px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      border-color: rgba(255, 255, 255, 0.6);
 
-// 响应式调整
-@media (max-width: 960px) {
-  .favorites-view {
-    padding: 16px;
-  }
-
-  .header-card {
-    .d-flex {
-      flex-direction: column;
-      align-items: flex-start !important;
-      gap: 16px;
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .favorites-view {
-    padding: 12px;
-  }
-
-  .header-card {
-    .v-avatar {
-      display: none;
-    }
-
-    .v-btn {
-      width: 100%;
-    }
-  }
-
-  .toolbar-card {
-    .d-flex {
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .v-select {
-      max-width: 100% !important;
+      .v-theme--dark & {
+        background-color: rgba(15, 23, 42, 0.5) !important;
+        border-color: rgba(255, 255, 255, 0.2);
+      }
     }
   }
 }

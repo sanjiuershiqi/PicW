@@ -1,30 +1,34 @@
 <template>
   <v-container fluid class="images-view">
     <!-- 页面头部 -->
-    <v-card variant="flat" class="header-card mb-6">
-      <v-card-text class="d-flex align-center pa-4">
+    <v-card class="header-card mb-6 glass-panel" elevation="0">
+      <v-card-text class="d-flex align-center pa-6">
         <!-- 左侧：标题和仓库信息 -->
         <div class="d-flex align-center flex-grow-1">
-          <v-avatar color="primary" size="48" class="me-4">
-            <v-icon size="28">mdi-folder-multiple-image</v-icon>
-          </v-avatar>
+          <div class="header-icon-wrapper mr-5">
+            <v-icon size="32" color="primary">mdi-folder-multiple-image</v-icon>
+            <div class="icon-glow"></div>
+          </div>
           <div>
-            <h1 class="text-h5 font-weight-bold mb-1">图片管理</h1>
-            <div class="d-flex align-center text-body-2 text-medium-emphasis">
-              <v-icon size="16" class="me-1">mdi-github</v-icon>
-              <span>{{ search.name }} / {{ search.repository }}</span>
+            <h1 class="text-h4 font-weight-bold mb-1 header-title">图片管理</h1>
+            <div class="d-flex align-center text-body-1 text-secondary">
+              <v-icon size="18" class="mr-2">mdi-github</v-icon>
+              <span class="font-mono text-uppercase tracking-wider">{{ search.name }} / {{ search.repository }}</span>
             </div>
           </div>
         </div>
 
         <!-- 右侧：操作按钮 -->
-        <div class="d-flex align-center gap-2">
+        <div class="d-flex align-center gap-3">
           <!-- 统计信息按钮 -->
           <v-btn
-            :variant="showStats ? 'tonal' : 'outlined'"
-            :color="showStats ? 'primary' : undefined"
+            :color="showStats ? 'primary' : 'transparent'"
+            :class="[showStats ? 'bg-primary' : 'glass-btn']"
             prepend-icon="mdi-chart-box"
             @click="showStats = !showStats"
+            rounded="pill"
+            class="px-6 transition-all"
+            elevation="0"
           >
             {{ showStats ? '隐藏统计' : '显示统计' }}
           </v-btn>
@@ -32,10 +36,13 @@
           <!-- README 切换按钮 -->
           <v-btn
             v-if="readmeText"
-            :variant="showReadme ? 'tonal' : 'outlined'"
-            :color="showReadme ? 'primary' : undefined"
+            :color="showReadme ? 'primary' : 'transparent'"
+            :class="[showReadme ? 'bg-primary' : 'glass-btn']"
             prepend-icon="mdi-file-document"
             @click="showReadme = !showReadme"
+            rounded="pill"
+            class="px-6 transition-all"
+            elevation="0"
           >
             {{ showReadme ? '隐藏 README' : '显示 README' }}
           </v-btn>
@@ -199,9 +206,82 @@ const loadContent = async () => {
 }
 
 .header-card {
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(var(--v-theme-surface), 0.8) 0%, rgba(var(--v-theme-surface), 1) 100%);
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+.header-title {
+  letter-spacing: -0.5px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+
+  .v-theme--dark & {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.header-icon-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--v-theme-primary), 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.2);
+
+  .icon-glow {
+    position: absolute;
+    inset: -10px;
+    background: radial-gradient(circle, rgba(var(--v-theme-primary), 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    filter: blur(8px);
+    pointer-events: none;
+  }
+
+  .v-icon {
+    z-index: 1;
+    text-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.4);
+  }
+}
+
+.glass-btn {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  color: rgb(var(--v-theme-on-surface));
+  font-weight: 600;
+
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    color: rgb(var(--v-theme-primary));
+
+    .v-theme--dark & {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+  }
 }
 
 .gap-2 {

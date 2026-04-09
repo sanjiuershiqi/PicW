@@ -40,6 +40,7 @@
             hide-details
             prepend-inner-icon="mdi-sort-variant"
             class="glass-select"
+            :menu-props="{ contentClass: 'glass-select-menu', offset: 8 }"
             style="min-width: 140px; max-width: 180px"
           />
         </div>
@@ -48,7 +49,7 @@
         <div class="view-toggle d-flex rounded-pill glass-panel p-1 mr-3">
           <v-btn
             :color="viewMode === 'grid' ? 'primary' : 'transparent'"
-            :class="{'elevation-2': viewMode === 'grid'}"
+            :class="{ 'elevation-2': viewMode === 'grid' }"
             size="small"
             rounded="pill"
             class="view-btn px-4"
@@ -58,7 +59,7 @@
           </v-btn>
           <v-btn
             :color="viewMode === 'list' ? 'primary' : 'transparent'"
-            :class="{'elevation-2': viewMode === 'list'}"
+            :class="{ 'elevation-2': viewMode === 'list' }"
             size="small"
             rounded="pill"
             class="view-btn px-4"
@@ -100,7 +101,12 @@
             </template>
             <v-list density="compact" class="glass-menu rounded-xl mt-2" elevation="0">
               <v-list-subheader class="text-caption font-weight-medium px-4">File Types</v-list-subheader>
-              <v-list-item v-for="option in fileTypeOptions" :key="option.value" @click="toggleFileType(option.value)" class="menu-item mx-2 rounded-pill mb-1">
+              <v-list-item
+                v-for="option in fileTypeOptions"
+                :key="option.value"
+                @click="toggleFileType(option.value)"
+                class="menu-item mx-2 rounded-pill mb-1"
+              >
                 <template #prepend>
                   <v-checkbox-btn
                     :model-value="fileTypeFilter.includes(option.value)"
@@ -175,7 +181,7 @@ const toggleFileType = (type: string) => {
   -webkit-backdrop-filter: blur(24px);
   border-radius: 100px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-  
+
   .v-theme--dark & {
     background: rgba(15, 23, 42, 0.4) !important;
     border-color: rgba(255, 255, 255, 0.1);
@@ -196,7 +202,7 @@ const toggleFileType = (type: string) => {
     transform: translateX(-2px);
     background: rgb(var(--v-theme-primary)) !important;
     border-color: transparent;
-    
+
     .v-icon {
       color: rgb(var(--v-theme-on-primary)) !important;
     }
@@ -208,11 +214,11 @@ const toggleFileType = (type: string) => {
     padding: 4px 12px;
     border-radius: 100px;
     transition: all 0.2s ease;
-    
+
     &:hover:not(.v-breadcrumbs-item--disabled) {
       background: rgba(255, 255, 255, 0.5);
       color: rgb(var(--v-theme-primary)) !important;
-      
+
       .v-theme--dark & {
         background: rgba(0, 0, 0, 0.3);
       }
@@ -228,14 +234,28 @@ const toggleFileType = (type: string) => {
 }
 
 .glass-select-wrapper {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  padding: 0 4px;
-  
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
   .v-theme--dark & {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.3) !important;
     border-color: rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background: rgba(15, 23, 42, 0.5) !important;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
   }
 }
 
@@ -244,13 +264,71 @@ const toggleFileType = (type: string) => {
     font-size: 0.875rem;
     font-weight: 600;
     color: rgb(var(--v-theme-primary));
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    padding-top: 8px;
+    padding-bottom: 8px;
+
+    .v-theme--dark & {
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  :deep(.v-field__append-inner) {
+    color: rgb(var(--v-theme-primary));
+    opacity: 0.8;
+  }
+
+  :deep(.v-field__prepend-inner) {
+    color: rgb(var(--v-theme-primary));
+    opacity: 0.8;
+  }
+}
+
+/* 这是一个全局样式，因为 v-menu 被渲染在 body 底部，不过由于它在 style scoped 之外，我们需要把它移出 scoped，或者使用 :global */
+:global(.glass-select-menu) {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 16px !important;
+
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .v-list {
+    background: transparent !important;
+    padding: 8px;
+  }
+
+  .v-list-item {
+    border-radius: 10px !important;
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.5) !important;
+      transform: translateX(4px);
+    }
+
+    &.v-list-item--active {
+      background: rgba(var(--v-theme-primary), 0.1) !important;
+      color: rgb(var(--v-theme-primary)) !important;
+      font-weight: 600;
+    }
   }
 }
 
 .glass-panel {
   background: rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.5);
-  
+
   .v-theme--dark & {
     background: rgba(0, 0, 0, 0.2);
     border-color: rgba(255, 255, 255, 0.1);
@@ -259,10 +337,10 @@ const toggleFileType = (type: string) => {
 
 .view-btn {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  
+
   &:hover:not(.bg-primary) {
     background: rgba(255, 255, 255, 0.5) !important;
-    
+
     .v-theme--dark & {
       background: rgba(0, 0, 0, 0.3) !important;
     }
@@ -274,7 +352,7 @@ const toggleFileType = (type: string) => {
   height: 6px;
   border-radius: 50%;
   background: rgba(var(--v-theme-primary), 0.2);
-  box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 .action-btn {
@@ -282,23 +360,23 @@ const toggleFileType = (type: string) => {
   border: 1px solid rgba(255, 255, 255, 0.5);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
-  
+
   .v-theme--dark & {
     background: rgba(0, 0, 0, 0.2) !important;
     border-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   &:hover {
     transform: translateY(-2px);
     background: rgb(var(--v-theme-primary)) !important;
     border-color: transparent;
     box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.2);
-    
+
     .v-icon {
       color: rgb(var(--v-theme-on-primary)) !important;
     }
   }
-  
+
   &.bg-primary {
     border-color: transparent;
     box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.2);
@@ -314,7 +392,7 @@ const toggleFileType = (type: string) => {
   border-radius: 50%;
   background: rgb(var(--v-theme-accent));
   box-shadow: 0 0 8px rgb(var(--v-theme-accent));
-  border: 1px solid rgba(255,255,255,0.8);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .glass-menu {
@@ -324,15 +402,15 @@ const toggleFileType = (type: string) => {
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
   padding: 8px 0;
-  
+
   .v-theme--dark & {
     background: rgba(15, 23, 42, 0.6) !important;
     border-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   .menu-item {
     transition: all 0.2s ease;
-    
+
     &:hover {
       background-color: rgba(var(--v-theme-primary), 0.05);
       transform: translateX(4px);
@@ -345,13 +423,13 @@ const toggleFileType = (type: string) => {
   .image-toolbar-card {
     border-radius: 24px !important;
   }
-  
+
   .toolbar-actions {
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 8px;
   }
-  
+
   .divider-orb {
     display: none;
   }

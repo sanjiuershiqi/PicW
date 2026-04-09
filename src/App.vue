@@ -1,6 +1,6 @@
 <template>
   <v-app @contextmenu.prevent v-scroll="onScroll" class="app-container">
-    <header class="glass-header" :class="{ 'scrolled': !atTop }">
+    <header class="glass-header" :class="{ scrolled: !atTop }">
       <div class="header-content mx-auto w-100 px-6 d-flex align-center">
         <!-- Logo -->
         <div class="logo-area d-flex align-center cursor-pointer" @click="$router.push('/')">
@@ -12,10 +12,8 @@
 
         <!-- Navigation -->
         <nav class="nav-area d-none d-md-flex align-center">
-          <router-link to="/images" class="nav-link" active-class="active">
-            Images
-          </router-link>
-          
+          <router-link to="/images" class="nav-link" active-class="active"> Images </router-link>
+
           <router-link to="/favorites" class="nav-link" active-class="active">
             Favorites
             <v-chip v-if="favoriteCount > 0" size="x-small" color="accent" class="ml-2 px-2 fw-bold">{{ favoriteCount }}</v-chip>
@@ -27,7 +25,7 @@
           <v-btn icon variant="text" size="small" @click="toggleTheme" class="tool-btn mr-2" color="primary">
             <v-icon size="20">{{ getThemeIcon }}</v-icon>
           </v-btn>
-          
+
           <v-btn to="/setting" icon variant="text" size="small" class="tool-btn mr-2" color="primary">
             <v-icon size="20">mdi-tune-variant</v-icon>
           </v-btn>
@@ -180,7 +178,7 @@ const onScroll = (event: Event) => {
   &.scrolled {
     background-color: rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-    
+
     .v-theme--dark & {
       background-color: rgba(15, 23, 42, 0.4);
     }
@@ -194,7 +192,7 @@ const onScroll = (event: Event) => {
 
 .logo-area {
   transition: opacity 0.3s;
-  
+
   &:hover {
     opacity: 0.8;
     .logo-orb {
@@ -208,7 +206,7 @@ const onScroll = (event: Event) => {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgb(var(--v-theme-accent)), #FF9A9E);
+  background: linear-gradient(135deg, rgb(var(--v-theme-accent)), #ff9a9e);
   box-shadow: 0 0 10px rgba(var(--v-theme-accent), 0.5);
   transition: all 0.3s ease;
 }
@@ -217,10 +215,10 @@ const onScroll = (event: Event) => {
   font-size: 1.4rem;
   letter-spacing: -0.5px;
   color: rgb(var(--v-theme-primary));
-  text-shadow: 0 2px 10px rgba(255,255,255,0.2);
-  
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+
   .v-theme--dark & {
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -231,7 +229,7 @@ const onScroll = (event: Event) => {
   border-radius: 100px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-  
+
   .v-theme--dark & {
     background: rgba(0, 0, 0, 0.1);
     border-color: rgba(255, 255, 255, 0.05);
@@ -259,7 +257,7 @@ const onScroll = (event: Event) => {
     opacity: 1;
     background-color: rgb(var(--v-theme-primary));
     color: rgb(var(--v-theme-background));
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -271,16 +269,16 @@ const onScroll = (event: Event) => {
   background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  
+
   .v-theme--dark & {
     background: rgba(0, 0, 0, 0.2) !important;
     border-color: rgba(255, 255, 255, 0.05);
   }
-  
+
   &:hover {
     transform: translateY(-2px);
     background: rgba(var(--v-theme-primary), 0.1) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 }
 
@@ -292,15 +290,15 @@ const onScroll = (event: Event) => {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
   border-radius: 20px !important;
   padding: 8px 0;
-  
+
   .v-theme--dark & {
     background: rgba(15, 23, 42, 0.6) !important;
     border-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   .menu-item {
     transition: all 0.2s ease;
-    
+
     &:hover {
       background-color: rgba(var(--v-theme-primary), 0.08);
       transform: translateX(4px);

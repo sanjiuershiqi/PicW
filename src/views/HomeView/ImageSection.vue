@@ -21,21 +21,15 @@
               <v-spacer></v-spacer>
               <v-icon icon="mdi-pencil" size="small" color="secondary"></v-icon>
             </div>
-            
+
             <div class="links-container">
               <TextChip v-for="item in items(useName)" :key="item.text" :label="item.label" :text="item.text" :disabled="!uploaded" />
             </div>
           </div>
-          
+
           <div class="pa-4 bg-surface-variant d-flex justify-space-between align-center" v-show="!uploaded">
             <span class="text-caption text-secondary">Ready to upload</span>
-            <v-btn 
-              variant="flat" 
-              color="primary" 
-              class="px-6" 
-              @click="uploadImage" 
-              :loading="uploading"
-            >
+            <v-btn variant="flat" color="primary" class="px-6" @click="uploadImage" :loading="uploading">
               Upload
               <template #loader>
                 <div class="d-flex align-center">
@@ -147,7 +141,7 @@ const uploadImage = async () => {
   transition: all 0.2s;
   background: rgb(var(--v-theme-surface));
   border: 1px solid rgb(var(--v-theme-border-color));
-  
+
   &:hover {
     border-color: rgba(var(--v-theme-primary), 0.2);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -174,7 +168,7 @@ const uploadImage = async () => {
 
 .delete-btn {
   transition: all 0.15s;
-  
+
   &:hover {
     transform: scale(1.05);
     background: rgb(var(--v-theme-error)) !important;
@@ -209,11 +203,11 @@ const uploadImage = async () => {
   transition: all 0.15s;
   font-size: 0.95rem !important;
   line-height: 1.4;
-  
+
   &:hover {
     background: rgba(var(--v-theme-primary), 0.04);
   }
-  
+
   &:focus {
     background: rgb(var(--v-theme-surface));
     border-color: rgba(var(--v-theme-primary), 0.2);

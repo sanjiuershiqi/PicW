@@ -45,7 +45,14 @@
             class="mr-1"
             @click.stop="handleToggleFavorite(image)"
           />
-          <v-btn icon="mdi-eye-outline" size="small" variant="text" color="medium-emphasis" class="mr-2" @click.stop="emit('preview', image)" />
+          <v-btn
+            icon="mdi-eye-outline"
+            size="small"
+            variant="text"
+            color="medium-emphasis"
+            class="mr-2"
+            @click.stop="emit('preview', image)"
+          />
           <v-checkbox-btn :model-value="selectedImages.includes(image.sha)" color="accent" @click.stop="handleSelect(image)" />
         </template>
       </v-list-item>
@@ -54,7 +61,12 @@
     <!-- 网格视图（图片数量较少时） -->
     <v-row v-else>
       <v-col v-for="image in images" :key="image.sha" cols="12" sm="6" md="4" lg="3">
-        <v-card class="image-card" :class="{ 'selected-card': selectedImages.includes(image.sha) }" @click="handleSelect(image)" elevation="0">
+        <v-card
+          class="image-card"
+          :class="{ 'selected-card': selectedImages.includes(image.sha) }"
+          @click="handleSelect(image)"
+          elevation="0"
+        >
           <div class="overflow-hidden">
             <v-img
               :src="getImageUrl(image)"
@@ -263,7 +275,7 @@ const formatFileSize = (bytes: number): string => {
   border-color: rgba(255, 255, 255, 0.8) !important;
   box-shadow: 0 8px 32px rgba(var(--v-theme-accent), 0.2), 0 0 0 2px rgb(var(--v-theme-accent)) !important;
   transform: translateY(-4px) scale(1.02);
-  
+
   .selected-badge {
     position: absolute;
     top: 12px;
@@ -284,9 +296,15 @@ const formatFileSize = (bytes: number): string => {
 }
 
 @keyframes popIn {
-  0% { transform: scale(0); }
-  70% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .image-card {
@@ -298,18 +316,18 @@ const formatFileSize = (bytes: number): string => {
   -webkit-backdrop-filter: blur(12px);
   border-radius: 24px !important;
   position: relative;
-  
+
   .v-theme--dark & {
     background: rgba(15, 23, 42, 0.3) !important;
     border-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
     border-color: rgba(255, 255, 255, 0.8);
     background: rgba(255, 255, 255, 0.4) !important;
-    
+
     .v-theme--dark & {
       background: rgba(15, 23, 42, 0.5) !important;
       border-color: rgba(255, 255, 255, 0.2);
@@ -326,7 +344,7 @@ const formatFileSize = (bytes: number): string => {
   background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(8px);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  
+
   .v-theme--dark & {
     background: rgba(0, 0, 0, 0.2);
     border-color: rgba(255, 255, 255, 0.05);
@@ -336,7 +354,7 @@ const formatFileSize = (bytes: number): string => {
 .image-name {
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-  
+
   .v-theme--dark & {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   }
@@ -345,13 +363,13 @@ const formatFileSize = (bytes: number): string => {
 .image-list {
   background: transparent !important;
   padding: 0;
-  
+
   .selected-item {
     background-color: rgba(255, 255, 255, 0.4) !important;
     border-left: 4px solid rgb(var(--v-theme-accent)) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transform: translateX(4px);
-    
+
     .v-theme--dark & {
       background-color: rgba(15, 23, 42, 0.6) !important;
     }
@@ -366,7 +384,7 @@ const formatFileSize = (bytes: number): string => {
     backdrop-filter: blur(12px);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     padding: 8px 16px;
-    
+
     .v-theme--dark & {
       background: rgba(15, 23, 42, 0.3) !important;
       border-color: rgba(255, 255, 255, 0.1);
@@ -375,9 +393,9 @@ const formatFileSize = (bytes: number): string => {
     &:hover {
       background-color: rgba(255, 255, 255, 0.5) !important;
       transform: translateX(4px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
       border-color: rgba(255, 255, 255, 0.6);
-      
+
       .v-theme--dark & {
         background-color: rgba(15, 23, 42, 0.5) !important;
         border-color: rgba(255, 255, 255, 0.2);
@@ -389,7 +407,7 @@ const formatFileSize = (bytes: number): string => {
 .selected-overlay {
   background: rgba(255, 255, 255, 0.2) !important;
   backdrop-filter: blur(2px) saturate(120%);
-  
+
   .v-theme--dark & {
     background: rgba(0, 0, 0, 0.2) !important;
   }

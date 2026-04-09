@@ -30,7 +30,14 @@
               Delete
             </v-btn>
 
-            <v-btn variant="text" size="small" icon="mdi-close" color="secondary" class="ml-2 close-btn" @click="$emit('clear-selection')" />
+            <v-btn
+              variant="text"
+              size="small"
+              icon="mdi-close"
+              color="secondary"
+              class="ml-2 close-btn"
+              @click="$emit('clear-selection')"
+            />
           </div>
         </div>
       </div>
@@ -76,7 +83,7 @@ defineEmits<{
   display: flex;
   align-items: center;
   min-width: 500px;
-  
+
   .v-theme--dark & {
     background: rgba(15, 23, 42, 0.4);
     border-color: rgba(255, 255, 255, 0.1);
@@ -91,7 +98,7 @@ defineEmits<{
   display: flex;
   align-items: center;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-  
+
   .v-theme--dark & {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   }
@@ -120,12 +127,12 @@ defineEmits<{
     color: rgb(var(--v-theme-primary));
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.1);
-    
+
     .v-theme--dark & {
       background: rgba(255, 255, 255, 0.1);
     }
   }
-  
+
   &.text-error:hover {
     background: rgba(var(--v-theme-error), 0.1);
     color: rgb(var(--v-theme-error)) !important;
@@ -136,12 +143,12 @@ defineEmits<{
 .close-btn {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 50%;
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.5);
     color: rgb(var(--v-theme-primary)) !important;
     transform: rotate(90deg);
-    
+
     .v-theme--dark & {
       background: rgba(255, 255, 255, 0.1);
     }
@@ -153,8 +160,8 @@ defineEmits<{
   height: 20px;
   background: rgba(var(--v-theme-primary), 0.2);
   border-radius: 2px;
-  box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);
-  
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+
   .v-theme--dark & {
     background: rgba(255, 255, 255, 0.1);
     box-shadow: none;
@@ -166,17 +173,17 @@ defineEmits<{
     bottom: 16px;
     padding: 0 16px;
   }
-  
+
   .util-batch-bar {
     min-width: auto;
     width: 100%;
   }
-  
+
   .batch-actions {
     .v-btn span {
       display: none;
     }
-    
+
     .v-icon {
       margin: 0 !important;
     }

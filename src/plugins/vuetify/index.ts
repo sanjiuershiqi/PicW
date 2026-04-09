@@ -23,7 +23,7 @@ export default createVuetify({
           'on-background': '#1A1A2E',
           'on-surface': '#1A1A2E',
           'on-primary': '#FFFFFF',
-          'on-surface-variant': '#1A1A2E',
+          'on-surface-variant': '#1A1A2E'
         },
         variables: {
           'border-color': '#FFFFFF',
@@ -37,7 +37,7 @@ export default createVuetify({
           'selected-opacity': 0.15,
           'activated-opacity': 0.2,
           'pressed-opacity': 0.25,
-          'dragged-opacity': 0.2,
+          'dragged-opacity': 0.2
         }
       },
       dark: {
@@ -56,7 +56,7 @@ export default createVuetify({
           'on-background': '#F8FAFC',
           'on-surface': '#F8FAFC',
           'on-primary': '#FFFFFF',
-          'on-surface-variant': '#F8FAFC',
+          'on-surface-variant': '#F8FAFC'
         },
         variables: {
           'border-color': '#FFFFFF',
@@ -70,7 +70,7 @@ export default createVuetify({
           'selected-opacity': 0.15,
           'activated-opacity': 0.2,
           'pressed-opacity': 0.25,
-          'dragged-opacity': 0.2,
+          'dragged-opacity': 0.2
         }
       }
     }
@@ -79,12 +79,12 @@ export default createVuetify({
     VCard: {
       elevation: 0,
       rounded: 'xl', // Soft organic curves
-      style: 'backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 8px 32px rgba(0,0,0,0.05);',
+      style: 'backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 8px 32px rgba(0,0,0,0.05);'
     },
     VBtn: {
       rounded: 'pill', // Liquid/organic pill shapes
       elevation: 0,
-      style: 'text-transform: none; font-weight: 600; letter-spacing: 0.5px; backdrop-filter: blur(8px);',
+      style: 'text-transform: none; font-weight: 600; letter-spacing: 0.5px; backdrop-filter: blur(8px);'
     },
     VTextField: {
       variant: 'solo',
@@ -92,20 +92,20 @@ export default createVuetify({
       hideDetails: 'auto',
       density: 'comfortable',
       bgColor: 'surface',
-      style: 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);',
+      style: 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);'
     },
     VFileInput: {
       variant: 'solo',
       rounded: 'xl',
       hideDetails: 'auto',
-      bgColor: 'surface',
+      bgColor: 'surface'
     },
     VChip: {
       rounded: 'pill',
-      style: 'backdrop-filter: blur(8px);',
+      style: 'backdrop-filter: blur(8px);'
     },
     VAvatar: {
-      rounded: 'circle',
+      rounded: 'circle'
     }
   }
 })
