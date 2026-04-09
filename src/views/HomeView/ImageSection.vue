@@ -1,26 +1,25 @@
 <template>
-  <v-container @click.stop class="pa-0 mb-4">
-    <v-card class="image-section-card overflow-hidden" elevation="0" rounded="xl">
+  <v-container @click.stop class="pa-0">
+    <v-card class="image-section-card" elevation="0">
       <v-row no-gutters>
-        <v-col cols="12" sm="4" class="image-col">
+        <v-col cols="12" sm="4" class="image-col border-r">
           <v-hover #default="{ isHovering, props }">
             <v-img v-bind="props" :src="blob2Url" height="100%" min-height="200" cover class="preview-img">
-              <div class="overlay-gradient"></div>
-              <v-overlay :model-value="isHovering" contained class="align-center justify-center overlay-blur">
-                <v-btn color="error" variant="flat" icon="mdi-delete-outline" @click="delEvent" size="large" class="delete-btn"></v-btn>
+              <v-overlay :model-value="isHovering" contained class="align-center justify-center brutalist-overlay">
+                <v-btn color="primary" variant="flat" icon="mdi-delete" @click="delEvent" size="large" class="delete-btn rounded-0"></v-btn>
               </v-overlay>
-              <div class="filesize-badge">{{ filesize(props.filesize) }}</div>
+              <div class="filesize-badge font-mono">{{ filesize(props.filesize) }}</div>
             </v-img>
           </v-hover>
         </v-col>
         <v-col cols="12" sm="8" class="content-col d-flex flex-column">
-          <div class="pa-5 flex-grow-1">
-            <div class="d-flex align-center mb-4">
-              <v-icon icon="mdi-file-image-outline" color="accent" class="mr-2"></v-icon>
+          <div class="pa-5 flex-grow-1 border-b">
+            <div class="d-flex align-start mb-4">
               <h3 class="text-h6 font-weight-bold mb-0 editable-filename" contenteditable @keyup="keyUp" spellcheck="false">
                 {{ filename }}
               </h3>
-              <v-icon icon="mdi-pencil-outline" size="small" color="medium-emphasis" class="ml-2"></v-icon>
+              <v-spacer></v-spacer>
+              <v-icon icon="mdi-pencil" size="small" color="primary"></v-icon>
             </div>
             
             <div class="links-container">
@@ -28,22 +27,19 @@
             </div>
           </div>
           
-          <div class="pa-4 bg-surface-variant d-flex justify-end align-center" v-show="!uploaded">
+          <div class="pa-4 bg-surface-variant d-flex justify-space-between align-center" v-show="!uploaded">
+            <span class="font-mono text-caption text-uppercase">Status: Pending</span>
             <v-btn 
               variant="flat" 
               color="accent" 
-              rounded="pill" 
-              class="px-6 upload-btn" 
+              class="px-6 upload-btn font-mono" 
               @click="uploadImage" 
               :loading="uploading"
-              elevation="2"
             >
-              <v-icon start icon="mdi-cloud-upload-outline"></v-icon>
-              Upload to GitHub
+              INITIATE_UPLOAD
               <template #loader>
                 <div class="d-flex align-center">
-                  <v-progress-circular :model-value="progress" size="20" width="2" color="white" class="mr-2"></v-progress-circular>
-                  <span>{{ progress }}%</span>
+                  <span class="mr-2">[{{ progress }}%]</span>
                 </div>
               </template>
             </v-btn>
@@ -148,57 +144,60 @@ const uploadImage = async () => {
 
 <style scoped lang="scss">
 .image-section-card {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  background: rgba(var(--v-theme-surface), 0.7);
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  transition: all 0.2s;
+  background: rgb(var(--v-theme-surface));
+  border: 2px solid rgb(var(--v-theme-primary));
   
   &:hover {
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06) !important;
-    border-color: rgba(var(--v-theme-accent), 0.3);
+    box-shadow: 6px 6px 0 rgb(var(--v-theme-accent));
+    transform: translate(-2px, -2px);
   }
 }
 
-.image-col {
-  position: relative;
+.border-r {
+  border-right: 2px solid rgb(var(--v-theme-primary));
+}
+
+.border-b {
+  border-bottom: 2px solid rgb(var(--v-theme-primary));
 }
 
 .preview-img {
   position: relative;
-  
-  .overlay-gradient {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
-    z-index: 1;
-  }
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(var(--v-theme-primary), 0.05),
+    rgba(var(--v-theme-primary), 0.05) 10px,
+    transparent 10px,
+    transparent 20px
+  );
 }
 
-.overlay-blur {
-  backdrop-filter: blur(4px);
-  background: rgba(0, 0, 0, 0.2) !important;
+.brutalist-overlay {
+  background: rgba(var(--v-theme-accent), 0.8) !important;
+  backdrop-filter: grayscale(100%) contrast(200%);
 }
 
 .delete-btn {
-  transition: transform 0.2s;
+  border: 2px solid rgb(var(--v-theme-primary));
+  transition: all 0.1s;
+  
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.1) rotate(-5deg);
+    background: rgb(var(--v-theme-surface)) !important;
+    color: rgb(var(--v-theme-accent)) !important;
   }
 }
 
 .filesize-badge {
   position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
+  top: 0;
+  left: 0;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  padding: 4px 8px;
   font-size: 0.75rem;
-  font-weight: 600;
-  backdrop-filter: blur(4px);
+  font-weight: 700;
   z-index: 2;
 }
 
@@ -211,18 +210,19 @@ const uploadImage = async () => {
   cursor: text;
   padding: 4px 8px;
   margin: -4px -8px;
-  border-radius: 6px;
-  transition: all 0.2s;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
+  transition: all 0.1s;
+  font-family: var(--font-mono);
+  font-size: 1.1rem !important;
+  letter-spacing: -0.5px;
   
   &:hover {
-    background: rgba(var(--v-theme-on-surface), 0.04);
+    background: rgba(var(--v-theme-primary), 0.05);
   }
   
   &:focus {
-    background: rgba(var(--v-theme-surface), 1);
+    background: rgb(var(--v-theme-surface));
     border-color: rgb(var(--v-theme-accent));
-    box-shadow: 0 0 0 3px rgba(var(--v-theme-accent), 0.1);
   }
 }
 
@@ -233,14 +233,30 @@ const uploadImage = async () => {
 }
 
 .upload-btn {
-  font-weight: 600;
-  letter-spacing: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border: 2px solid rgb(var(--v-theme-primary));
+  transition: all 0.1s;
+  
+  &:hover {
+    transform: translate(2px, 2px);
+    box-shadow: -2px -2px 0 rgb(var(--v-theme-primary));
+  }
+  
+  &:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+  }
 }
 
 // 响应式
 @media (max-width: 600px) {
   .preview-img {
     min-height: 160px;
+  }
+  .border-r {
+    border-right: none;
+    border-bottom: 2px solid rgb(var(--v-theme-primary));
   }
 }
 </style>

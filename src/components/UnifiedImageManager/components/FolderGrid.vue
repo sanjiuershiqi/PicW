@@ -74,69 +74,80 @@ defineEmits<{
 <style scoped lang="scss">
 .folder-card {
   cursor: pointer;
-  border-radius: 20px;
-  background: rgba(var(--v-theme-surface), 0.6);
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 0;
+  background: rgb(var(--v-theme-surface));
+  border: 2px solid rgb(var(--v-theme-primary));
+  transition: all 0.1s;
   overflow: hidden;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06) !important;
-    background: rgba(var(--v-theme-surface), 1);
-    border-color: rgba(var(--v-theme-accent), 0.3);
+    transform: translate(-4px, -4px);
+    box-shadow: 6px 6px 0 rgb(var(--v-theme-accent)) !important;
 
     .chevron-icon {
       transform: translateX(4px);
       color: rgb(var(--v-theme-accent)) !important;
     }
+    
+    .folder-icon-wrapper {
+      background: rgb(var(--v-theme-primary));
+      color: rgb(var(--v-theme-on-primary));
+      
+      .v-icon {
+        color: rgb(var(--v-theme-on-primary)) !important;
+      }
+    }
   }
 }
 
 .folder-icon-wrapper {
-  width: 56px;
-  height: 56px;
-  min-width: 56px;
-  border-radius: 16px;
-  background: rgba(var(--v-theme-accent), 0.05);
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border: 2px solid rgb(var(--v-theme-primary));
+  background: rgb(var(--v-theme-surface));
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
-
-  .folder-card:hover & {
-    background: rgba(var(--v-theme-accent), 0.1);
-    transform: scale(1.05);
-  }
+  transition: all 0.1s;
 }
 
 .folder-name {
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
+  font-family: var(--font-mono);
+  font-weight: 700 !important;
+  text-transform: uppercase;
 }
 
 .chevron-icon {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.1s;
 }
 
 .folder-list {
+  border: 2px solid rgb(var(--v-theme-primary));
+  border-radius: 0;
+  
   .folder-list-item {
     cursor: pointer;
-    margin-bottom: 8px;
-    border-radius: 20px;
-    background: rgba(var(--v-theme-surface), 0.6);
-    border: 1px solid rgba(var(--v-theme-on-surface), 0.05);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    padding: 12px 16px;
+    background: rgb(var(--v-theme-surface));
+    border-bottom: 2px solid rgb(var(--v-theme-primary));
+    transition: all 0.1s;
+    padding: 16px;
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     &:hover {
-      background: rgba(var(--v-theme-surface), 1);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
-      transform: translateX(4px);
-      border-color: rgba(var(--v-theme-accent), 0.2);
+      background: rgba(var(--v-theme-accent), 0.1);
+      padding-left: 24px;
 
       .folder-icon-wrapper {
-        background: rgba(var(--v-theme-accent), 0.1);
-        transform: scale(1.05);
+        background: rgb(var(--v-theme-primary));
+        
+        .v-icon {
+          color: rgb(var(--v-theme-on-primary)) !important;
+        }
       }
     }
   }

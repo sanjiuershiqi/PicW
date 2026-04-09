@@ -1,25 +1,24 @@
 <template>
-  <v-card class="image-toolbar-card mb-4" elevation="0" rounded="xl">
-    <v-card-text class="d-flex align-center pa-4">
+  <v-card class="image-toolbar-card mb-6" elevation="0">
+    <v-card-text class="d-flex align-center pa-0">
       <!-- 左侧：导航区域 -->
-      <div class="d-flex align-center flex-grow-1">
+      <div class="d-flex align-center flex-grow-1 h-100 px-4 border-r">
         <!-- 返回按钮 -->
-        <v-btn v-if="canGoBack" icon variant="flat" size="small" color="surface-variant" @click="emit('go-back')" class="me-3 back-btn elevation-1">
+        <v-btn v-if="canGoBack" icon variant="flat" size="small" color="primary" @click="emit('go-back')" class="me-3 back-btn rounded-0">
           <v-icon size="small">mdi-arrow-left</v-icon>
-          <v-tooltip activator="parent" location="bottom"> Go Back </v-tooltip>
         </v-btn>
 
         <!-- 面包屑导航 -->
-        <v-breadcrumbs :items="breadcrumbItems" class="pa-0 flex-grow-0 breadcrumb-modern">
+        <v-breadcrumbs :items="breadcrumbItems" class="pa-0 flex-grow-0 breadcrumb-modern font-mono">
           <template #divider>
-            <v-icon size="small" color="medium-emphasis">mdi-chevron-right</v-icon>
+            <span class="mx-2 font-weight-bold">/</span>
           </template>
           <template #item="{ item }">
             <v-breadcrumbs-item
               :disabled="item.disabled"
               :to="item.disabled ? undefined : { path: '#' }"
               @click.prevent="!item.disabled && emit('navigate', item.path)"
-              class="text-body-2 font-weight-medium"
+              class="text-body-2 font-weight-bold text-uppercase"
               :class="item.disabled ? 'text-medium-emphasis' : 'text-accent'"
             >
               {{ item.title }}
@@ -28,111 +27,96 @@
         </v-breadcrumbs>
       </div>
 
-      <v-spacer />
-
       <!-- 右侧：操作区域 -->
-      <div class="d-flex align-center toolbar-actions">
+      <div class="d-flex align-center toolbar-actions h-100">
         <!-- 排序选择 -->
-        <v-select
-          :model-value="sortBy"
-          @update:model-value="emit('update:sortBy', $event)"
-          :items="sortOptions"
-          density="compact"
-          variant="plain"
-          hide-details
-          prepend-inner-icon="mdi-sort-variant"
-          class="modern-select"
-          style="min-width: 140px; max-width: 180px"
-        />
-
-        <div class="divider-dot mx-3"></div>
+        <div class="border-r h-100 d-flex align-center px-2">
+          <v-select
+            :model-value="sortBy"
+            @update:model-value="emit('update:sortBy', $event)"
+            :items="sortOptions"
+            density="compact"
+            variant="plain"
+            hide-details
+            prepend-inner-icon="mdi-sort-variant"
+            class="brutalist-select font-mono text-uppercase"
+            style="min-width: 140px; max-width: 180px"
+          />
+        </div>
 
         <!-- 视图模式切换 -->
-        <div class="view-toggle bg-surface-variant rounded-pill p-1 d-flex">
+        <div class="view-toggle d-flex h-100 border-r">
           <v-btn
-            :color="viewMode === 'grid' ? 'surface' : 'transparent'"
-            :class="{'elevation-1': viewMode === 'grid'}"
-            size="small"
-            rounded="pill"
-            class="px-3"
+            :color="viewMode === 'grid' ? 'primary' : 'transparent'"
+            size="large"
+            rounded="0"
+            class="px-4 h-100 view-btn"
             @click="emit('update:viewMode', 'grid')"
           >
-            <v-icon size="small">mdi-view-grid-outline</v-icon>
+            <v-icon>mdi-view-grid-outline</v-icon>
           </v-btn>
           <v-btn
-            :color="viewMode === 'list' ? 'surface' : 'transparent'"
-            :class="{'elevation-1': viewMode === 'list'}"
-            size="small"
-            rounded="pill"
-            class="px-3"
+            :color="viewMode === 'list' ? 'primary' : 'transparent'"
+            size="large"
+            rounded="0"
+            class="px-4 h-100 view-btn border-l"
             @click="emit('update:viewMode', 'list')"
           >
-            <v-icon size="small">mdi-format-list-bulleted</v-icon>
+            <v-icon>mdi-format-list-bulleted</v-icon>
           </v-btn>
         </div>
 
-        <div class="divider-dot mx-3"></div>
+        <!-- 操作按钮组 -->
+        <div class="d-flex h-100">
+          <v-btn
+            :color="showImagesOnly ? 'accent' : 'transparent'"
+            variant="flat"
+            size="large"
+            rounded="0"
+            class="action-btn h-100 border-r px-4"
+            @click="emit('update:showImagesOnly', !showImagesOnly)"
+          >
+            <v-icon>{{ showImagesOnly ? 'mdi-image-outline' : 'mdi-folder-multiple-image' }}</v-icon>
+          </v-btn>
 
-        <!-- 仅显示图片按钮 -->
-        <v-btn
-          :color="showImagesOnly ? 'accent' : 'medium-emphasis'"
-          variant="text"
-          size="small"
-          icon
-          class="action-btn"
-          @click="emit('update:showImagesOnly', !showImagesOnly)"
-        >
-          <v-icon size="small">{{ showImagesOnly ? 'mdi-image-outline' : 'mdi-folder-multiple-image' }}</v-icon>
-          <v-tooltip activator="parent" location="bottom">
-            {{ showImagesOnly ? 'Show all files' : 'Show images only' }}
-          </v-tooltip>
-        </v-btn>
-
-        <!-- 文件类型筛选 -->
-        <v-menu>
-          <template #activator="{ props }">
-            <v-btn
-              v-bind="props"
-              :color="fileTypeFilter.length > 0 ? 'accent' : 'medium-emphasis'"
-              variant="text"
-              size="small"
-              icon
-              class="action-btn ml-1"
-            >
-              <v-badge v-if="fileTypeFilter.length > 0" dot color="error" class="filter-badge">
-                <v-icon size="small">mdi-filter-variant</v-icon>
-              </v-badge>
-              <v-icon v-else size="small">mdi-filter-variant</v-icon>
-              <v-tooltip activator="parent" location="bottom"> Filter file types </v-tooltip>
-            </v-btn>
-          </template>
-          <v-list density="compact" class="rounded-xl mt-2 elevation-4" bg-color="surface">
-            <v-list-subheader class="text-caption font-weight-bold px-4">FILE TYPES</v-list-subheader>
-            <v-list-item v-for="option in fileTypeOptions" :key="option.value" @click="toggleFileType(option.value)" class="mx-2 rounded-lg mb-1">
-              <template #prepend>
+          <!-- 文件类型筛选 -->
+          <v-menu transition="none">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                :color="fileTypeFilter.length > 0 ? 'accent' : 'transparent'"
+                variant="flat"
+                size="large"
+                rounded="0"
+                class="action-btn h-100 border-r px-4"
+              >
+                <v-icon>mdi-filter-variant</v-icon>
+                <span v-if="fileTypeFilter.length > 0" class="filter-count font-mono">[{{ fileTypeFilter.length }}]</span>
+              </v-btn>
+            </template>
+            <div class="brutalist-menu">
+              <div class="menu-header font-mono">FILE TYPES</div>
+              <div v-for="option in fileTypeOptions" :key="option.value" class="menu-item" @click="toggleFileType(option.value)">
                 <v-checkbox-btn
                   :model-value="fileTypeFilter.includes(option.value)"
                   @click.stop="toggleFileType(option.value)"
                   density="compact"
-                  color="accent"
+                  color="primary"
+                  class="mr-2"
                 />
-              </template>
-              <v-list-item-title class="text-body-2 font-weight-medium">{{ option.title }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+                <span class="font-mono text-uppercase">{{ option.title }}</span>
+              </div>
+            </div>
+          </v-menu>
 
-        <!-- 高级搜索按钮 -->
-        <v-btn variant="text" size="small" icon color="accent" class="action-btn ml-1" @click="emit('advanced-search')">
-          <v-icon size="small">mdi-magnify-expand</v-icon>
-          <v-tooltip activator="parent" location="bottom"> Advanced Search </v-tooltip>
-        </v-btn>
+          <v-btn variant="flat" size="large" rounded="0" class="action-btn h-100 border-r px-4" @click="emit('advanced-search')">
+            <v-icon>mdi-magnify-expand</v-icon>
+          </v-btn>
 
-        <!-- 刷新按钮 -->
-        <v-btn variant="text" size="small" icon color="medium-emphasis" class="action-btn ml-1" @click="emit('refresh')">
-          <v-icon size="small">mdi-refresh</v-icon>
-          <v-tooltip activator="parent" location="bottom"> Refresh </v-tooltip>
-        </v-btn>
+          <v-btn variant="flat" size="large" rounded="0" class="action-btn h-100 px-4" @click="emit('refresh')">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
+        </div>
       </div>
     </v-card-text>
   </v-card>
@@ -179,87 +163,146 @@ const toggleFileType = (type: string) => {
 
 <style scoped lang="scss">
 .image-toolbar-card {
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-  background: rgba(var(--v-theme-surface), 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgb(var(--v-theme-primary));
+  background: rgb(var(--v-theme-surface));
+  height: 64px;
+}
+
+.border-r {
+  border-right: 2px solid rgb(var(--v-theme-primary));
+}
+
+.border-l {
+  border-left: 2px solid rgb(var(--v-theme-primary));
+}
+
+.h-100 {
+  height: 100%;
 }
 
 .back-btn {
-  background: rgba(var(--v-theme-on-surface), 0.04) !important;
-  transition: all 0.2s;
+  border: 2px solid rgb(var(--v-theme-primary));
+  transition: all 0.1s;
 
   &:hover {
-    background: rgba(var(--v-theme-on-surface), 0.08) !important;
-    transform: translateX(-2px);
+    background: rgb(var(--v-theme-accent)) !important;
+    transform: translate(-2px, -2px);
+    box-shadow: 2px 2px 0 rgb(var(--v-theme-primary));
   }
 }
 
 .breadcrumb-modern {
   :deep(.v-breadcrumbs-item) {
     padding: 0 4px;
-    transition: color 0.2s;
+    transition: color 0.1s;
     
     &:hover:not(.v-breadcrumbs-item--disabled) {
       color: rgb(var(--v-theme-accent)) !important;
-      opacity: 0.8;
+      background: rgb(var(--v-theme-primary));
     }
   }
 }
 
-.divider-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: rgba(var(--v-theme-on-surface), 0.2);
+.brutalist-select {
+  :deep(.v-field__input) {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  :deep(.v-field__append-inner) {
+    padding-top: 4px;
+  }
 }
 
-.modern-select {
-  :deep(.v-field__input) {
-    font-size: 0.875rem;
-    font-weight: 500;
+.view-btn {
+  transition: all 0.1s;
+  
+  &:hover:not(.bg-primary) {
+    background: rgba(var(--v-theme-primary), 0.1) !important;
+  }
+  
+  &.bg-primary {
+    color: rgb(var(--v-theme-on-primary)) !important;
   }
 }
 
 .action-btn {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  background: transparent;
+  transition: all 0.1s;
+  color: rgb(var(--v-theme-primary));
   
   &:hover {
-    background: rgba(var(--v-theme-accent), 0.1) !important;
-    color: rgb(var(--v-theme-accent)) !important;
-    transform: scale(1.05);
+    background: rgb(var(--v-theme-primary)) !important;
+    color: rgb(var(--v-theme-on-primary)) !important;
+  }
+  
+  &.bg-accent {
+    color: rgb(var(--v-theme-on-primary)) !important;
+    
+    &:hover {
+      filter: brightness(1.2);
+    }
   }
 }
 
-.filter-badge {
-  :deep(.v-badge__badge) {
-    right: 2px;
-    top: 2px;
+.filter-count {
+  margin-left: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.brutalist-menu {
+  background: rgb(var(--v-theme-surface));
+  border: 2px solid rgb(var(--v-theme-primary));
+  box-shadow: 8px 8px 0 rgb(var(--v-theme-accent));
+  min-width: 200px;
+  margin-top: 8px;
+}
+
+.menu-header {
+  padding: 12px 16px;
+  border-bottom: 2px solid rgb(var(--v-theme-primary));
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  font-weight: 700;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 2px solid rgb(var(--v-theme-primary));
+  cursor: pointer;
+  transition: all 0.1s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(var(--v-theme-accent), 0.1);
+    padding-left: 24px;
   }
 }
 
 // 响应式调整
 @media (max-width: 960px) {
+  .image-toolbar-card {
+    height: auto;
+  }
   .toolbar-actions {
     flex-wrap: wrap;
-    gap: 4px;
+    border-left: none;
+    border-top: 2px solid rgb(var(--v-theme-primary));
+    width: 100%;
   }
-  
-  .divider-dot {
-    display: none;
+  .border-r {
+    border-right: none;
+    border-bottom: 2px solid rgb(var(--v-theme-primary));
   }
-}
-
-@media (max-width: 600px) {
-  .image-toolbar-card {
-    .v-breadcrumbs {
-      max-width: 150px;
-      overflow: hidden;
-    }
-
-    .v-select {
-      min-width: 120px !important;
+  .view-toggle {
+    width: 100%;
+    border-bottom: 2px solid rgb(var(--v-theme-primary));
+    .view-btn {
+      flex: 1;
     }
   }
 }

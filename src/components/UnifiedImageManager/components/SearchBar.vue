@@ -1,26 +1,24 @@
 <template>
-  <div class="search-wrapper">
+  <div class="search-wrapper mb-6">
     <v-text-field
       :model-value="searchQuery"
       @update:model-value="$emit('update:searchQuery', $event)"
-      placeholder="Search for images..."
+      placeholder="SEARCH IMAGES..."
       clearable
       hide-details
       density="comfortable"
-      variant="solo-filled"
-      class="modern-search"
+      variant="outlined"
+      class="brutalist-search font-mono text-uppercase"
       :loading="isSearching"
-      rounded="xl"
-      elevation="0"
-      bg-color="rgba(var(--v-theme-surface), 0.6)"
+      bg-color="surface"
     >
       <template #prepend-inner>
-        <v-icon color="medium-emphasis" class="ml-2 mr-2">mdi-magnify</v-icon>
+        <v-icon color="primary" class="ml-2 mr-2">mdi-magnify</v-icon>
       </template>
       <template #append-inner>
-        <v-chip v-if="resultCount !== null" size="small" color="accent" variant="tonal" class="font-weight-bold mr-2">
-          {{ resultCount }} results
-        </v-chip>
+        <div v-if="resultCount !== null" class="result-badge font-mono">
+          [{{ resultCount }} RESULTS]
+        </div>
       </template>
     </v-text-field>
   </div>
@@ -41,38 +39,33 @@ defineEmits<{
 </script>
 
 <style scoped lang="scss">
-.modern-search {
-  border-radius: 24px;
-  overflow: hidden;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  
+.brutalist-search {
   :deep(.v-field) {
-    box-shadow: none !important;
-    border-radius: 24px !important;
-    padding-right: 8px;
+    border: 2px solid rgb(var(--v-theme-primary));
+    box-shadow: 4px 4px 0 rgb(var(--v-theme-accent)) !important;
+    transition: all 0.1s;
+    border-radius: 0 !important;
     
     &.v-field--focused {
-      background: rgba(var(--v-theme-surface), 1) !important;
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 rgb(var(--v-theme-accent)) !important;
     }
   }
 
   :deep(.v-field__input) {
-    font-weight: 500;
-    letter-spacing: -0.2px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
-  
-  &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
-    border-color: rgba(var(--v-theme-accent), 0.3);
-  }
+}
 
-  &:focus-within {
-    box-shadow: 0 8px 32px rgba(var(--v-theme-accent), 0.1) !important;
-    border-color: rgb(var(--v-theme-accent));
-    transform: translateY(-2px);
-  }
+.result-badge {
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 </style>

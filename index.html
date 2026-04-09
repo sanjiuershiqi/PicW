@@ -4,28 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>PicW - Modern Image Manager</title>
-    <!-- Inject Modern Font -->
+    <!-- Inject Editorial & Brutalist Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Syne:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
     <style>
       :root {
-        --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-primary: 'Syne', sans-serif;
+        --font-mono: 'Space Mono', monospace;
       }
       body {
-        font-family: var(--font-family) !important;
+        font-family: var(--font-primary) !important;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background-color: #F5F5F7;
+        background-color: #EAE6DF; /* Brutalist off-white/beige paper color */
         margin: 0;
         padding: 0;
+        color: #111111;
       }
       * {
-        font-family: var(--font-family) !important;
+        font-family: var(--font-primary);
       }
-      /* Smooth transitions for theme changes */
+      .font-mono {
+        font-family: var(--font-mono) !important;
+      }
+      /* Hard transitions */
       body, .v-application {
-        transition: background-color 0.3s ease, color 0.3s ease;
+        transition: background-color 0.1s ease, color 0.1s ease;
       }
     </style>
     <meta name="description" content="A site for uploading images to github" />

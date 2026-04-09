@@ -1,38 +1,38 @@
 <template>
   <v-slide-y-reverse-transition>
     <div v-if="selectedCount > 0" class="batch-actions-wrapper">
-      <v-card elevation="10" rounded="pill" class="batch-actions-bar">
-        <v-card-text class="d-flex align-center py-2 px-4 px-sm-6">
+      <div class="brutalist-batch-bar">
+        <div class="d-flex align-center py-2 px-4 px-sm-6 w-100">
           <!-- 选中信息 -->
-          <div class="d-flex align-center selection-info bg-accent rounded-pill px-3 py-1 mr-4">
-            <span class="text-caption font-weight-bold text-white">{{ selectedCount }} selected</span>
+          <div class="selection-badge font-mono mr-4">
+            [{{ selectedCount }} SELECTED]
           </div>
 
           <v-spacer />
 
           <!-- 操作按钮 -->
           <div class="batch-actions">
-            <v-btn variant="text" size="small" rounded="pill" @click="$emit('copy-links')" class="action-btn text-body-2 font-weight-medium">
+            <v-btn variant="text" size="small" @click="$emit('copy-links')" class="action-btn font-mono">
               <v-icon start size="small">mdi-link-variant</v-icon>
-              Copy
+              COPY
             </v-btn>
 
-            <v-btn variant="text" size="small" rounded="pill" @click="$emit('batch-download')" class="action-btn text-body-2 font-weight-medium">
+            <v-btn variant="text" size="small" @click="$emit('batch-download')" class="action-btn font-mono">
               <v-icon start size="small">mdi-download-outline</v-icon>
-              Download
+              DOWNLOAD
             </v-btn>
 
-            <div class="divider-dot mx-2"></div>
+            <div class="divider-line mx-2"></div>
 
-            <v-btn variant="text" size="small" rounded="pill" color="error" @click="$emit('batch-delete')" class="action-btn text-body-2 font-weight-medium">
+            <v-btn variant="text" size="small" @click="$emit('batch-delete')" class="action-btn font-mono text-accent">
               <v-icon start size="small">mdi-delete-outline</v-icon>
-              Delete
+              DELETE
             </v-btn>
 
-            <v-btn variant="tonal" size="small" icon="mdi-close" color="medium-emphasis" class="ml-2 close-btn" @click="$emit('clear-selection')" />
+            <v-btn variant="flat" size="small" icon="mdi-close" color="primary" class="ml-2 close-btn rounded-0" @click="$emit('clear-selection')" />
           </div>
-        </v-card-text>
-      </v-card>
+        </div>
+      </div>
     </div>
   </v-slide-y-reverse-transition>
 </template>
@@ -64,17 +64,22 @@ defineEmits<{
   pointer-events: none;
 }
 
-.batch-actions-bar {
+.brutalist-batch-bar {
   pointer-events: auto;
-  background: rgba(var(--v-theme-surface), 0.85) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.1);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+  background: rgb(var(--v-theme-surface));
+  border: 2px solid rgb(var(--v-theme-primary));
+  box-shadow: 8px 8px 0 rgb(var(--v-theme-accent));
+  display: flex;
+  align-items: center;
+  min-width: 600px;
 }
 
-.selection-info {
-  box-shadow: 0 4px 12px rgba(var(--v-theme-accent), 0.3);
+.selection-badge {
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  padding: 4px 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 .batch-actions {
@@ -83,29 +88,33 @@ defineEmits<{
 }
 
 .action-btn {
-  text-transform: none;
-  letter-spacing: 0;
-  transition: all 0.2s;
-  color: rgba(var(--v-theme-on-surface), 0.8);
+  letter-spacing: 1px;
+  font-weight: 700;
+  transition: all 0.1s;
+  border: 2px solid transparent;
+  color: rgb(var(--v-theme-primary));
 
   &:hover {
-    background: rgba(var(--v-theme-on-surface), 0.05);
-    color: rgb(var(--v-theme-on-surface));
+    background: rgba(var(--v-theme-primary), 0.1);
+    border-color: rgb(var(--v-theme-primary));
+    transform: translate(-2px, -2px);
+    box-shadow: 2px 2px 0 rgb(var(--v-theme-primary));
   }
 }
 
 .close-btn {
-  transition: transform 0.2s;
+  transition: all 0.1s;
   &:hover {
-    transform: rotate(90deg);
+    transform: rotate(90deg) scale(1.1);
+    background: rgb(var(--v-theme-accent)) !important;
+    color: rgb(var(--v-theme-on-primary)) !important;
   }
 }
 
-.divider-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: rgba(var(--v-theme-on-surface), 0.2);
+.divider-line {
+  width: 2px;
+  height: 24px;
+  background: rgb(var(--v-theme-primary));
 }
 
 @media (max-width: 600px) {
@@ -114,9 +123,9 @@ defineEmits<{
     padding: 0 16px;
   }
   
-  .batch-actions-bar {
+  .brutalist-batch-bar {
+    min-width: auto;
     width: 100%;
-    border-radius: 24px !important;
   }
   
   .batch-actions {

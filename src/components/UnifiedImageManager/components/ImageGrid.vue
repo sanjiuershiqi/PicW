@@ -86,23 +86,24 @@
                   {{ image.name }}
                 </div>
               </template>
-              <span>{{ image.name }}</span>
+              <span class="font-mono text-uppercase">{{ image.name }}</span>
             </v-tooltip>
 
             <v-btn
               :icon="favoritesStore.isFavorite(image.sha) ? 'mdi-star' : 'mdi-star-outline'"
               size="small"
-              :color="favoritesStore.isFavorite(image.sha) ? 'accent' : 'medium-emphasis'"
+              :color="favoritesStore.isFavorite(image.sha) ? 'accent' : 'primary'"
               variant="text"
               @click.stop="handleToggleFavorite(image)"
             />
-            <v-btn icon="mdi-eye-outline" size="small" variant="text" color="medium-emphasis" @click.stop="emit('preview', image)" />
+            <v-btn icon="mdi-eye-outline" size="small" variant="text" color="primary" @click.stop="emit('preview', image)" />
           </v-card-actions>
 
           <!-- 选中标记 -->
-          <v-overlay v-if="selectedImages.includes(image.sha)" contained class="align-center justify-center selected-overlay" opacity="1">
-            <v-icon size="48" color="accent" class="elevation-4 rounded-circle bg-surface">mdi-check-circle</v-icon>
-          </v-overlay>
+          <div v-if="selectedImages.includes(image.sha)" class="selected-badge">
+            <v-icon size="small">mdi-check</v-icon>
+          </div>
+          <v-overlay v-if="selectedImages.includes(image.sha)" contained class="selected-overlay" opacity="1"></v-overlay>
         </v-card>
       </v-col>
     </v-row>
@@ -260,69 +261,98 @@ const formatFileSize = (bytes: number): string => {
 <style scoped lang="scss">
 .selected-card {
   border-color: rgb(var(--v-theme-accent)) !important;
-  box-shadow: 0 0 0 2px rgb(var(--v-theme-accent)) !important;
-  transform: translateY(-4px);
+  box-shadow: 4px 4px 0 rgb(var(--v-theme-accent)) !important;
+  transform: translate(-2px, -2px);
+  
+  .selected-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgb(var(--v-theme-accent));
+    color: rgb(var(--v-theme-on-primary));
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgb(var(--v-theme-primary));
+    z-index: 2;
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
 }
 
 .image-card {
-  border-radius: 20px;
+  border-radius: 0;
   overflow: hidden;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  background: rgba(var(--v-theme-surface), 0.6);
+  border: 2px solid rgb(var(--v-theme-primary));
+  transition: all 0.1s;
+  background: rgb(var(--v-theme-surface));
+  position: relative;
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-    border-color: rgba(var(--v-theme-accent), 0.3);
+    transform: translate(-4px, -4px);
+    box-shadow: 6px 6px 0 rgb(var(--v-theme-accent));
+    border-color: rgb(var(--v-theme-accent));
   }
 }
 
 .image-preview {
   cursor: pointer;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  
-  .image-card:hover & {
-    transform: scale(1.05);
-  }
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(var(--v-theme-primary), 0.05),
+    rgba(var(--v-theme-primary), 0.05) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  border-bottom: 2px solid rgb(var(--v-theme-primary));
 }
 
 .image-actions {
-  background: rgba(var(--v-theme-surface), 0.85);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.05);
+  background: rgb(var(--v-theme-surface));
 }
 
 .image-name {
-  font-weight: 500;
-  letter-spacing: -0.2px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
 .image-list {
   background: transparent;
+  border: 2px solid rgb(var(--v-theme-primary));
+  padding: 0;
   
   .selected-item {
-    background-color: rgba(var(--v-theme-accent), 0.05) !important;
-    border-left: 4px solid rgb(var(--v-theme-accent));
+    background-color: rgba(var(--v-theme-accent), 0.1) !important;
+    border-left: 4px solid rgb(var(--v-theme-accent)) !important;
   }
 
   .list-item-modern {
-    margin-bottom: 8px;
-    border-radius: 16px;
-    border: 1px solid rgba(var(--v-theme-on-surface), 0.05);
-    background: rgba(var(--v-theme-surface), 0.6);
-    transition: all 0.3s;
+    margin-bottom: 0;
+    border-radius: 0;
+    border: none;
+    border-bottom: 2px solid rgb(var(--v-theme-primary));
+    border-left: 4px solid transparent;
+    background: rgb(var(--v-theme-surface));
+    transition: all 0.1s;
+    padding: 8px 16px;
+
+    &:last-child {
+      border-bottom: none;
+    }
 
     &:hover {
-      background-color: rgba(var(--v-theme-surface), 1);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-      transform: translateX(4px);
+      background-color: rgba(var(--v-theme-primary), 0.05);
+      padding-left: 24px;
     }
   }
 }
 
 .selected-overlay {
-  backdrop-filter: blur(2px);
-  background: rgba(var(--v-theme-accent), 0.15) !important;
+  background: rgba(var(--v-theme-accent), 0.2) !important;
+  backdrop-filter: grayscale(100%) contrast(150%);
 }
 </style>

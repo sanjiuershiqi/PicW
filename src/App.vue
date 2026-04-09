@@ -1,62 +1,61 @@
 <template>
   <v-app @contextmenu.prevent v-scroll="onScroll" class="app-container">
-    <v-app-bar
-      :elevation="0"
-      class="header"
-      :class="{ 'header-scrolled': !atTop }"
-    >
-      <div class="header-content mx-auto w-100 px-4 d-flex align-center" style="max-width: 1400px;">
-        <!-- 主题切换 -->
-        <v-btn :icon="getThemeIcon" @click="toggleTheme" variant="text" class="theme-btn" />
-
-        <!-- 标题 -->
-        <v-app-bar-title class="font-weight-bold mx-4">
-          <span @click="$router.push('/')" class="home logo-text">Pic<span class="text-accent">W</span></span>
-        </v-app-bar-title>
-
-        <v-spacer />
-
-        <!-- 导航按钮 -->
-        <div class="nav-links d-none d-md-flex align-center">
-          <v-btn to="/images" variant="text" class="nav-btn" rounded="pill">
-            <v-icon start icon="mdi-image-search-outline"></v-icon>
-            图片管理
-          </v-btn>
-
-          <v-btn to="/favorites" variant="text" class="nav-btn" rounded="pill">
-            <v-icon start icon="mdi-star"></v-icon>
-            我的收藏
-            <v-badge v-if="favoriteCount > 0" :content="favoriteCount" color="accent" inline class="ms-1" />
-          </v-btn>
+    <header class="brutalist-header" :class="{ 'scrolled': !atTop }">
+      <div class="header-grid">
+        <!-- Logo -->
+        <div class="header-cell logo-cell" @click="$router.push('/')">
+          <span class="logo-text">PICW</span>
+          <span class="logo-badge">SYS</span>
         </div>
 
-        <v-btn to="/setting" icon="mdi-cog-outline" variant="text" class="ms-2 icon-btn" />
+        <!-- Navigation -->
+        <nav class="header-cell nav-cell d-none d-md-flex">
+          <router-link to="/images" class="nav-link" active-class="active">
+            <span class="link-num">01</span>
+            <span class="link-text">IMAGES</span>
+          </router-link>
+          
+          <router-link to="/favorites" class="nav-link" active-class="active">
+            <span class="link-num">02</span>
+            <span class="link-text">FAVORITES</span>
+            <span v-if="favoriteCount > 0" class="fav-count">[{{ favoriteCount }}]</span>
+          </router-link>
+        </nav>
 
-        <!-- 测试菜单 -->
-        <v-menu transition="slide-y-transition">
-          <template #activator="{ props }">
-            <v-btn v-bind="props" icon="mdi-test-tube" variant="text" class="icon-btn" />
-          </template>
-          <v-list density="compact" class="rounded-xl mt-2 elevation-4" bg-color="surface">
-            <v-list-item to="/test" prepend-icon="mdi-test-tube" class="rounded-lg mx-2 mb-1">
-              <v-list-item-title>组件测试</v-list-item-title>
-            </v-list-item>
-            <v-list-item to="/folder-test" prepend-icon="mdi-folder-search" class="rounded-lg mx-2">
-              <v-list-item-title>文件夹测试</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+        <!-- Tools -->
+        <div class="header-cell tools-cell">
+          <v-btn icon variant="text" @click="toggleTheme" class="tool-btn">
+            <v-icon>{{ getThemeIcon }}</v-icon>
+          </v-btn>
+          
+          <v-btn to="/setting" icon variant="text" class="tool-btn">
+            <v-icon>mdi-cog</v-icon>
+          </v-btn>
+
+          <v-menu transition="none">
+            <template #activator="{ props }">
+              <v-btn v-bind="props" icon variant="text" class="tool-btn">
+                <v-icon>mdi-test-tube</v-icon>
+              </v-btn>
+            </template>
+            <div class="brutalist-menu">
+              <router-link to="/test" class="menu-item">COMPONENTS</router-link>
+              <router-link to="/folder-test" class="menu-item">FOLDERS</router-link>
+            </div>
+          </v-menu>
+        </div>
       </div>
-    </v-app-bar>
-    <v-main class="main-content">
-      <div class="content-wrapper mx-auto" style="max-width: 1400px; padding: 24px;">
+    </header>
+
+    <v-main class="main-content pt-16">
+      <div class="content-wrapper">
         <router-view #default="{ Component, route }">
-          <transition name="page-fade" mode="out-in">
+          <transition name="hard-cut" mode="out-in">
             <keep-alive>
               <component v-if="route.meta.keepAlive" :is="Component" :key="route.fullPath" />
             </keep-alive>
           </transition>
-          <transition name="page-fade" mode="out-in">
+          <transition name="hard-cut" mode="out-in">
             <component v-if="!route.meta.keepAlive" :is="Component" />
           </transition>
         </router-view>
@@ -151,86 +150,208 @@ const onScroll = (event: Event) => {
 <style scoped lang="scss">
 .app-container {
   background-color: rgb(var(--v-theme-background));
+  min-height: 100vh;
 }
 
-.header {
-  background-color: rgba(var(--v-theme-surface), 0.7) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(var(--v-border-color), 0.05);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+/* Brutalist Header */
+.brutalist-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: rgb(var(--v-theme-background));
+  border-bottom: 2px solid rgb(var(--v-theme-border-color));
+  transition: transform 0.2s ease;
 
-  &.header-scrolled {
-    background-color: rgba(var(--v-theme-surface), 0.85) !important;
-    border-bottom: 1px solid rgba(var(--v-border-color), 0.1);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  &.scrolled {
+    transform: translateY(-100%); /* Hide on scroll down for brutalism */
+    
+    &:hover {
+      transform: translateY(0); /* Show on hover */
+    }
+  }
+}
+
+.header-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  height: 64px;
+}
+
+.header-cell {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-right: 2px solid rgb(var(--v-theme-border-color));
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+/* Logo */
+.logo-cell {
+  cursor: pointer;
+  background-color: rgb(var(--v-theme-accent));
+  color: rgb(var(--v-theme-on-surface));
+  gap: 8px;
+  transition: filter 0.1s;
+
+  &:hover {
+    filter: invert(100%);
   }
 }
 
 .logo-text {
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -1px;
+}
+
+.logo-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  border: 1px solid currentColor;
+  padding: 2px 4px;
+  line-height: 1;
+}
+
+/* Navigation */
+.nav-cell {
+  gap: 0;
+  padding: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: baseline;
+  height: 100%;
+  padding: 0 32px;
+  color: rgb(var(--v-theme-on-surface));
+  text-decoration: none;
+  border-right: 2px solid rgb(var(--v-theme-border-color));
+  transition: all 0.1s;
+  position: relative;
+  overflow: hidden;
+
+  .link-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    margin-right: 8px;
+    opacity: 0.5;
+  }
+
+  .link-text {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    align-self: center;
+  }
+
+  .fav-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    margin-left: 8px;
+    color: rgb(var(--v-theme-accent));
+    font-weight: 700;
+    align-self: center;
+  }
+
+  &:hover {
+    background-color: rgb(var(--v-theme-on-surface));
+    color: rgb(var(--v-theme-background));
+
+    .link-num { opacity: 1; }
+  }
+
+  &.active {
+    background-color: rgb(var(--v-theme-accent));
+    color: rgb(var(--v-theme-on-surface));
+    
+    .link-num { color: rgb(var(--v-theme-on-surface)); opacity: 1; }
+    .fav-count { color: rgb(var(--v-theme-on-surface)); }
+  }
+}
+
+/* Tools */
+.tools-cell {
+  gap: 8px;
+}
+
+.tool-btn {
+  border-radius: 0 !important;
+  border: 2px solid transparent;
   
   &:hover {
-    opacity: 0.8;
+    background-color: transparent !important;
+    border-color: rgb(var(--v-theme-on-surface));
+    transform: translate(2px, -2px);
+    box-shadow: -2px 2px 0 rgb(var(--v-theme-accent));
   }
 }
 
-.text-accent {
-  color: rgb(var(--v-theme-accent));
+.brutalist-menu {
+  background: rgb(var(--v-theme-background));
+  border: 2px solid rgb(var(--v-theme-border-color));
+  box-shadow: 8px 8px 0 rgba(var(--v-theme-accent), 1);
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  margin-top: 8px;
 }
 
-.nav-btn {
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  margin: 0 4px;
-  padding: 0 16px;
-  opacity: 0.8;
-  transition: all 0.2s;
+.menu-item {
+  padding: 16px 24px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  color: rgb(var(--v-theme-on-surface));
+  text-decoration: none;
+  border-bottom: 2px solid rgb(var(--v-theme-border-color));
+  transition: all 0.1s;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   &:hover {
-    opacity: 1;
-    background-color: rgba(var(--v-theme-on-surface), 0.04);
-  }
-
-  &.v-btn--active {
-    opacity: 1;
-    background-color: rgba(var(--v-theme-on-surface), 0.08);
+    background: rgb(var(--v-theme-accent));
+    padding-left: 32px;
   }
 }
 
-.icon-btn, .theme-btn {
-  opacity: 0.7;
-  transition: all 0.2s;
-  
-  &:hover {
-    opacity: 1;
-    transform: scale(1.05);
-    background-color: rgba(var(--v-theme-on-surface), 0.04);
-  }
+/* Content Layout */
+.main-content {
+  min-height: 100vh;
 }
 
-/* Page Transitions */
-.page-fade-enter-active,
-.page-fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+.content-wrapper {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 48px 24px;
 }
-.page-fade-enter-from {
+
+/* Hard Cut Transitions */
+.hard-cut-enter-active,
+.hard-cut-leave-active {
+  transition: opacity 0.1s;
+}
+.hard-cut-enter-from,
+.hard-cut-leave-to {
   opacity: 0;
-  transform: translateY(10px);
-}
-.page-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
 }
 
-// 响应式调整
-@media (max-width: 600px) {
+@media (max-width: 960px) {
+  .header-grid {
+    grid-template-columns: auto 1fr;
+  }
+  .nav-cell {
+    display: none !important;
+  }
   .content-wrapper {
-    padding: 16px !important;
+    padding: 24px 16px;
   }
 }
 </style>
