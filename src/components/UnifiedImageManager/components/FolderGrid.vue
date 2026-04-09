@@ -74,15 +74,29 @@ defineEmits<{
 <style scoped lang="scss">
 .folder-card {
   cursor: pointer;
-  border-radius: 0;
-  background: rgb(var(--v-theme-surface));
-  border: 2px solid rgb(var(--v-theme-primary));
-  transition: all 0.1s;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 24px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
   &:hover {
-    transform: translate(-4px, -4px);
-    box-shadow: 6px 6px 0 rgb(var(--v-theme-accent)) !important;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08) !important;
+    background: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.8);
+
+    .v-theme--dark & {
+      background: rgba(15, 23, 42, 0.5);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
 
     .chevron-icon {
       transform: translateX(4px);
@@ -90,63 +104,81 @@ defineEmits<{
     }
     
     .folder-icon-wrapper {
-      background: rgb(var(--v-theme-primary));
-      color: rgb(var(--v-theme-on-primary));
+      background: rgba(var(--v-theme-accent), 0.1);
+      transform: scale(1.05);
       
       .v-icon {
-        color: rgb(var(--v-theme-on-primary)) !important;
+        color: rgb(var(--v-theme-accent)) !important;
       }
     }
   }
 }
 
 .folder-icon-wrapper {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  border: 2px solid rgb(var(--v-theme-primary));
-  background: rgb(var(--v-theme-surface));
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 16px;
+  background: rgba(var(--v-theme-primary), 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.1s;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  .v-theme--dark & {
+    background: rgba(255, 255, 255, 0.05);
+  }
 }
 
 .folder-name {
-  letter-spacing: 0;
-  font-family: var(--font-mono);
-  font-weight: 700 !important;
-  text-transform: uppercase;
+  letter-spacing: -0.2px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  
+  .v-theme--dark & {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
 }
 
 .chevron-icon {
-  transition: all 0.1s;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .folder-list {
-  border: 2px solid rgb(var(--v-theme-primary));
-  border-radius: 0;
+  background: transparent !important;
   
   .folder-list-item {
     cursor: pointer;
-    background: rgb(var(--v-theme-surface));
-    border-bottom: 2px solid rgb(var(--v-theme-primary));
-    transition: all 0.1s;
-    padding: 16px;
+    margin-bottom: 8px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 12px 16px;
 
-    &:last-child {
-      border-bottom: none;
+    .v-theme--dark & {
+      background: rgba(15, 23, 42, 0.3);
+      border-color: rgba(255, 255, 255, 0.1);
     }
 
     &:hover {
-      background: rgba(var(--v-theme-accent), 0.1);
-      padding-left: 24px;
+      background: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      transform: translateX(4px);
+      border-color: rgba(255, 255, 255, 0.6);
+
+      .v-theme--dark & {
+        background: rgba(15, 23, 42, 0.5);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
 
       .folder-icon-wrapper {
-        background: rgb(var(--v-theme-primary));
+        background: rgba(var(--v-theme-accent), 0.1);
+        transform: scale(1.05);
         
         .v-icon {
-          color: rgb(var(--v-theme-on-primary)) !important;
+          color: rgb(var(--v-theme-accent)) !important;
         }
       }
     }

@@ -260,87 +260,138 @@ const formatFileSize = (bytes: number): string => {
 
 <style scoped lang="scss">
 .selected-card {
-  border-color: rgb(var(--v-theme-primary)) !important;
-  box-shadow: 0 0 0 1px rgb(var(--v-theme-primary)) !important;
-  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 8px 32px rgba(var(--v-theme-accent), 0.2), 0 0 0 2px rgb(var(--v-theme-accent)) !important;
+  transform: translateY(-4px) scale(1.02);
   
   .selected-badge {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgb(var(--v-theme-primary));
-    color: rgb(var(--v-theme-on-primary));
-    width: 24px;
-    height: 24px;
-    border-radius: 12px;
+    top: 12px;
+    right: 12px;
+    background: rgb(var(--v-theme-accent));
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(var(--v-theme-accent), 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .image-card {
   overflow: hidden;
-  border: 1px solid rgb(var(--v-theme-border-color));
-  transition: all 0.2s ease;
-  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 24px !important;
   position: relative;
   
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
-    border-color: rgba(var(--v-theme-primary), 0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    border-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.4) !important;
+    
+    .v-theme--dark & {
+      background: rgba(15, 23, 42, 0.5) !important;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
   }
 }
 
 .image-preview {
   cursor: pointer;
-  background: rgb(var(--v-theme-surface-variant));
-  border-bottom: 1px solid rgb(var(--v-theme-border-color));
+  background: transparent;
 }
 
 .image-actions {
-  background: rgb(var(--v-theme-surface));
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  
+  .v-theme--dark & {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
 }
 
 .image-name {
-  font-weight: 500;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  
+  .v-theme--dark & {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
 }
 
 .image-list {
-  background: transparent;
-  border: 1px solid rgb(var(--v-theme-border-color));
-  border-radius: 8px;
+  background: transparent !important;
   padding: 0;
   
   .selected-item {
-    background-color: rgba(var(--v-theme-primary), 0.04) !important;
-    border-left: 3px solid rgb(var(--v-theme-primary)) !important;
+    background-color: rgba(255, 255, 255, 0.4) !important;
+    border-left: 4px solid rgb(var(--v-theme-accent)) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateX(4px);
+    
+    .v-theme--dark & {
+      background-color: rgba(15, 23, 42, 0.6) !important;
+    }
   }
 
   .list-item-modern {
-    margin-bottom: 0;
-    border-radius: 0;
-    border: none;
-    border-bottom: 1px solid rgb(var(--v-theme-border-color));
-    border-left: 3px solid transparent;
-    background: rgb(var(--v-theme-surface));
-    transition: all 0.15s ease;
-    padding: 12px 16px;
-
-    &:last-child {
-      border-bottom: none;
+    margin-bottom: 8px;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-left: 4px solid transparent;
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 8px 16px;
+    
+    .v-theme--dark & {
+      background: rgba(15, 23, 42, 0.3) !important;
+      border-color: rgba(255, 255, 255, 0.1);
     }
 
     &:hover {
-      background-color: rgba(var(--v-theme-primary), 0.02);
+      background-color: rgba(255, 255, 255, 0.5) !important;
+      transform: translateX(4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      border-color: rgba(255, 255, 255, 0.6);
+      
+      .v-theme--dark & {
+        background-color: rgba(15, 23, 42, 0.5) !important;
+        border-color: rgba(255, 255, 255, 0.2);
+      }
     }
   }
 }
 
 .selected-overlay {
-  background: rgba(var(--v-theme-primary), 0.05) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(2px) saturate(120%);
+  
+  .v-theme--dark & {
+    background: rgba(0, 0, 0, 0.2) !important;
+  }
 }
 </style>

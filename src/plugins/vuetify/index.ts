@@ -10,67 +10,67 @@ export default createVuetify({
       light: {
         dark: false,
         colors: {
-          background: '#FAFAFA', // Clean light gray
-          surface: '#FFFFFF', // Pure white cards
-          primary: '#1A1A1A', // Soft black for text/primary
-          secondary: '#737373', // Medium gray for secondary text
-          accent: '#000000', // Solid black for emphasis
-          error: '#E53935',
+          background: '#FFFFFF00', // Transparent to show body liquid background
+          surface: '#FFFFFF40', // Translucent white for glassmorphism
+          primary: '#1A1A2E', // Deep purple-black for text
+          secondary: '#64748B', // Slate gray
+          accent: '#FF3366', // Vibrant pink-red for interactive elements
+          error: '#F43F5E',
           info: '#3B82F6',
           success: '#10B981',
           warning: '#F59E0B',
-          'surface-variant': '#F5F5F5',
-          'on-background': '#1A1A1A',
-          'on-surface': '#1A1A1A',
+          'surface-variant': '#FFFFFF60', // Slightly more opaque white
+          'on-background': '#1A1A2E',
+          'on-surface': '#1A1A2E',
           'on-primary': '#FFFFFF',
-          'on-surface-variant': '#1A1A1A',
+          'on-surface-variant': '#1A1A2E',
         },
         variables: {
-          'border-color': '#E5E5E5',
-          'border-opacity': 1,
+          'border-color': '#FFFFFF',
+          'border-opacity': 0.4,
           'high-emphasis-opacity': 0.87,
           'medium-emphasis-opacity': 0.6,
           'disabled-opacity': 0.38,
-          'idle-opacity': 0.04,
-          'hover-opacity': 0.04,
-          'focus-opacity': 0.12,
-          'selected-opacity': 0.08,
-          'activated-opacity': 0.12,
-          'pressed-opacity': 0.12,
-          'dragged-opacity': 0.08,
+          'idle-opacity': 0.1,
+          'hover-opacity': 0.15,
+          'focus-opacity': 0.2,
+          'selected-opacity': 0.15,
+          'activated-opacity': 0.2,
+          'pressed-opacity': 0.25,
+          'dragged-opacity': 0.2,
         }
       },
       dark: {
         dark: true,
         colors: {
-          background: '#121212', // Deep dark gray
-          surface: '#1E1E1E', // Slightly lighter surface
-          primary: '#FAFAFA', // Off-white for text
-          secondary: '#A3A3A3', // Lighter gray
-          accent: '#FFFFFF', // Pure white for emphasis
+          background: '#00000000', // Transparent
+          surface: '#0F172A60', // Translucent deep blue-slate
+          primary: '#F8FAFC', // Crisp white text
+          secondary: '#94A3B8', // Slate gray
+          accent: '#FF3366', // Vibrant pink-red
           error: '#EF4444',
           info: '#60A5FA',
           success: '#34D399',
           warning: '#FBBF24',
-          'surface-variant': '#262626',
-          'on-background': '#FAFAFA',
-          'on-surface': '#FAFAFA',
-          'on-primary': '#121212',
-          'on-surface-variant': '#FAFAFA',
+          'surface-variant': '#1E293B80', // Slightly more opaque slate
+          'on-background': '#F8FAFC',
+          'on-surface': '#F8FAFC',
+          'on-primary': '#FFFFFF',
+          'on-surface-variant': '#F8FAFC',
         },
         variables: {
-          'border-color': '#333333',
-          'border-opacity': 1,
+          'border-color': '#FFFFFF',
+          'border-opacity': 0.15,
           'high-emphasis-opacity': 1,
           'medium-emphasis-opacity': 0.7,
           'disabled-opacity': 0.5,
           'idle-opacity': 0.1,
-          'hover-opacity': 0.04,
-          'focus-opacity': 0.12,
-          'selected-opacity': 0.08,
-          'activated-opacity': 0.12,
-          'pressed-opacity': 0.16,
-          'dragged-opacity': 0.08,
+          'hover-opacity': 0.15,
+          'focus-opacity': 0.2,
+          'selected-opacity': 0.15,
+          'activated-opacity': 0.2,
+          'pressed-opacity': 0.25,
+          'dragged-opacity': 0.2,
         }
       }
     }
@@ -78,29 +78,34 @@ export default createVuetify({
   defaults: {
     VCard: {
       elevation: 0,
-      rounded: 'lg', // 8px border radius for a clean look
+      rounded: 'xl', // Soft organic curves
+      style: 'backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 8px 32px rgba(0,0,0,0.05);',
     },
     VBtn: {
-      rounded: 'md', // 6px border radius
+      rounded: 'pill', // Liquid/organic pill shapes
       elevation: 0,
-      style: 'text-transform: none; font-weight: 500; letter-spacing: 0;',
+      style: 'text-transform: none; font-weight: 600; letter-spacing: 0.5px; backdrop-filter: blur(8px);',
     },
     VTextField: {
-      variant: 'outlined',
-      rounded: 'md',
+      variant: 'solo',
+      rounded: 'pill',
       hideDetails: 'auto',
       density: 'comfortable',
+      bgColor: 'surface',
+      style: 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);',
     },
     VFileInput: {
-      variant: 'outlined',
-      rounded: 'md',
+      variant: 'solo',
+      rounded: 'xl',
       hideDetails: 'auto',
+      bgColor: 'surface',
     },
     VChip: {
-      rounded: 'md',
+      rounded: 'pill',
+      style: 'backdrop-filter: blur(8px);',
     },
     VAvatar: {
-      rounded: 'md',
+      rounded: 'circle',
     }
   }
 })

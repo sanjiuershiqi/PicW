@@ -67,23 +67,34 @@ defineEmits<{
 
 .util-batch-bar {
   pointer-events: auto;
-  background: rgba(var(--v-theme-surface), 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgb(var(--v-theme-border-color));
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  border-radius: 32px;
   display: flex;
   align-items: center;
   min-width: 500px;
+  
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
 }
 
 .selection-badge {
   color: rgb(var(--v-theme-primary));
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
   display: flex;
   align-items: center;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  
+  .v-theme--dark & {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
 }
 
 .batch-actions {
@@ -92,35 +103,62 @@ defineEmits<{
 }
 
 .action-btn {
-  font-weight: 500;
+  font-weight: 600;
   text-transform: none;
-  letter-spacing: 0;
-  transition: all 0.15s ease;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   color: rgb(var(--v-theme-secondary));
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+
+  .v-theme--dark & {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
 
   &:hover {
-    background: rgba(var(--v-theme-primary), 0.05);
+    background: rgba(255, 255, 255, 0.5);
     color: rgb(var(--v-theme-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.1);
+    
+    .v-theme--dark & {
+      background: rgba(255, 255, 255, 0.1);
+    }
   }
   
   &.text-error:hover {
-    background: rgba(var(--v-theme-error), 0.05);
+    background: rgba(var(--v-theme-error), 0.1);
     color: rgb(var(--v-theme-error)) !important;
+    box-shadow: 0 4px 12px rgba(var(--v-theme-error), 0.15);
   }
 }
 
 .close-btn {
-  transition: all 0.15s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 50%;
+  
   &:hover {
-    background: rgba(var(--v-theme-primary), 0.05);
+    background: rgba(255, 255, 255, 0.5);
     color: rgb(var(--v-theme-primary)) !important;
+    transform: rotate(90deg);
+    
+    .v-theme--dark & {
+      background: rgba(255, 255, 255, 0.1);
+    }
   }
 }
 
 .divider-line {
-  width: 1px;
-  height: 16px;
-  background: rgb(var(--v-theme-border-color));
+  width: 2px;
+  height: 20px;
+  background: rgba(var(--v-theme-primary), 0.2);
+  border-radius: 2px;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);
+  
+  .v-theme--dark & {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+  }
 }
 
 @media (max-width: 600px) {

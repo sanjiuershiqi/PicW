@@ -8,9 +8,9 @@
       hide-details
       density="comfortable"
       variant="outlined"
-      class="brutalist-search font-mono text-uppercase"
+      class="glass-search font-mono text-uppercase"
       :loading="isSearching"
-      bg-color="surface"
+      bg-color="transparent"
     >
       <template #prepend-inner>
         <v-icon color="primary" class="ml-2 mr-2">mdi-magnify</v-icon>
@@ -39,33 +39,62 @@ defineEmits<{
 </script>
 
 <style scoped lang="scss">
-.brutalist-search {
+.glass-search {
   :deep(.v-field) {
-    border: 2px solid rgb(var(--v-theme-primary));
-    box-shadow: 4px 4px 0 rgb(var(--v-theme-accent)) !important;
-    transition: all 0.1s;
-    border-radius: 0 !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+    border-radius: 24px !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    
+    .v-theme--dark & {
+      background: rgba(15, 23, 42, 0.3) !important;
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    }
     
     &.v-field--focused {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0 rgb(var(--v-theme-accent)) !important;
+      background: rgba(255, 255, 255, 0.4) !important;
+      border-color: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 12px 40px rgba(var(--v-theme-primary), 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+      transform: translateY(-2px);
+      
+      .v-theme--dark & {
+        background: rgba(15, 23, 42, 0.5) !important;
+        border-color: rgba(255, 255, 255, 0.3);
+      }
     }
   }
 
   :deep(.v-field__input) {
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 1px;
-    padding-top: 16px;
-    padding-bottom: 16px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    
+    .v-theme--dark & {
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
   }
 }
 
 .result-badge {
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
-  padding: 4px 8px;
+  background: rgba(var(--v-theme-primary), 0.2);
+  color: rgb(var(--v-theme-primary));
+  padding: 4px 12px;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 1px;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.3);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);
+  backdrop-filter: blur(4px);
+  
+  .v-theme--dark & {
+    box-shadow: none;
+  }
 }
 </style>

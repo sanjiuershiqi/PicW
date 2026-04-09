@@ -4,29 +4,73 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>PicW - Modern Image Manager</title>
-    <!-- Inject Clean Utilitarian Font -->
+    <!-- Inject Elegant Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
-        --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-primary: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       }
       body {
         font-family: var(--font-primary) !important;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background-color: #FAFAFA;
         margin: 0;
         padding: 0;
-        color: #1A1A1A;
+        color: #1A1A2E;
+        background-color: #F8F9FA;
+        /* Dynamic Liquid Background Base */
+        background-image: 
+          radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+          radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+          radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+        background-attachment: fixed;
       }
+      
+      /* Light mode liquid gradient */
+      body {
+        background-color: #fdfbfb;
+        background-image: 
+          radial-gradient(at 40% 20%, hsla(28,100%,74%,0.3) 0px, transparent 50%),
+          radial-gradient(at 80% 0%, hsla(189,100%,56%,0.3) 0px, transparent 50%),
+          radial-gradient(at 0% 50%, hsla(355,100%,93%,0.3) 0px, transparent 50%),
+          radial-gradient(at 80% 50%, hsla(340,100%,76%,0.3) 0px, transparent 50%),
+          radial-gradient(at 0% 100%, hsla(22,100%,77%,0.3) 0px, transparent 50%),
+          radial-gradient(at 80% 100%, hsla(242,100%,70%,0.3) 0px, transparent 50%),
+          radial-gradient(at 0% 0%, hsla(343,100%,76%,0.3) 0px, transparent 50%);
+        background-size: 200% 200%;
+        animation: liquidBg 15s ease infinite alternate;
+      }
+
+      /* Dark mode liquid gradient - will be handled via class in App.vue if needed, 
+         but we can provide a default fallback here */
+      body.dark-mode {
+        background-color: #0F172A;
+        background-image: 
+          radial-gradient(at 40% 20%, hsla(28,100%,74%,0.15) 0px, transparent 50%),
+          radial-gradient(at 80% 0%, hsla(189,100%,56%,0.15) 0px, transparent 50%),
+          radial-gradient(at 0% 50%, hsla(355,100%,93%,0.15) 0px, transparent 50%),
+          radial-gradient(at 80% 50%, hsla(340,100%,76%,0.15) 0px, transparent 50%),
+          radial-gradient(at 0% 100%, hsla(22,100%,77%,0.15) 0px, transparent 50%),
+          radial-gradient(at 80% 100%, hsla(242,100%,70%,0.15) 0px, transparent 50%),
+          radial-gradient(at 0% 0%, hsla(343,100%,76%,0.15) 0px, transparent 50%);
+        color: #F8FAFC;
+      }
+
+      @keyframes liquidBg {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
       * {
         font-family: var(--font-primary);
       }
       /* Clean transitions */
       body, .v-application {
-        transition: background-color 0.2s ease, color 0.2s ease;
+        transition: background-color 0.4s ease, color 0.4s ease;
+        background: transparent !important; /* Let body background show through */
       }
     </style>
     <meta name="description" content="A site for uploading images to github" />

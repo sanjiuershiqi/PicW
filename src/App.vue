@@ -1,10 +1,10 @@
 <template>
   <v-app @contextmenu.prevent v-scroll="onScroll" class="app-container">
-    <header class="util-header" :class="{ 'scrolled': !atTop }">
+    <header class="glass-header" :class="{ 'scrolled': !atTop }">
       <div class="header-content mx-auto w-100 px-6 d-flex align-center">
         <!-- Logo -->
         <div class="logo-area d-flex align-center cursor-pointer" @click="$router.push('/')">
-          <v-icon icon="mdi-image-multiple" class="mr-2 text-primary" size="24" />
+          <div class="logo-orb mr-3"></div>
           <span class="logo-text font-weight-bold">PicW</span>
         </div>
 
@@ -13,41 +13,37 @@
         <!-- Navigation -->
         <nav class="nav-area d-none d-md-flex align-center">
           <router-link to="/images" class="nav-link" active-class="active">
-            <v-icon size="small" class="mr-1">mdi-image-search-outline</v-icon>
             Images
           </router-link>
           
           <router-link to="/favorites" class="nav-link" active-class="active">
-            <v-icon size="small" class="mr-1">mdi-star-outline</v-icon>
             Favorites
-            <v-chip v-if="favoriteCount > 0" size="x-small" color="primary" variant="flat" class="ml-1 px-1">{{ favoriteCount }}</v-chip>
+            <v-chip v-if="favoriteCount > 0" size="x-small" color="accent" class="ml-2 px-2 fw-bold">{{ favoriteCount }}</v-chip>
           </router-link>
         </nav>
 
-        <div class="divider-vertical mx-4 d-none d-md-block"></div>
-
         <!-- Tools -->
-        <div class="tools-area d-flex align-center">
-          <v-btn icon variant="text" size="small" @click="toggleTheme" class="tool-btn mr-1" color="secondary">
+        <div class="tools-area d-flex align-center ml-4">
+          <v-btn icon variant="text" size="small" @click="toggleTheme" class="tool-btn mr-2" color="primary">
             <v-icon size="20">{{ getThemeIcon }}</v-icon>
           </v-btn>
           
-          <v-btn to="/setting" icon variant="text" size="small" class="tool-btn mr-1" color="secondary">
-            <v-icon size="20">mdi-cog-outline</v-icon>
+          <v-btn to="/setting" icon variant="text" size="small" class="tool-btn mr-2" color="primary">
+            <v-icon size="20">mdi-tune-variant</v-icon>
           </v-btn>
 
-          <v-menu location="bottom end">
+          <v-menu location="bottom end" transition="slide-y-transition">
             <template #activator="{ props }">
-              <v-btn v-bind="props" icon variant="text" size="small" class="tool-btn" color="secondary">
-                <v-icon size="20">mdi-dots-vertical</v-icon>
+              <v-btn v-bind="props" icon variant="text" size="small" class="tool-btn" color="primary">
+                <v-icon size="20">mdi-dots-grid</v-icon>
               </v-btn>
             </template>
-            <v-list density="compact" class="util-menu rounded-lg mt-2" elevation="4">
-              <v-list-item to="/test" prepend-icon="mdi-test-tube" class="menu-item">
-                <v-list-item-title class="text-body-2">Component Test</v-list-item-title>
+            <v-list density="compact" class="glass-menu mt-2" elevation="0">
+              <v-list-item to="/test" prepend-icon="mdi-test-tube" class="menu-item rounded-pill mx-2 mb-1">
+                <v-list-item-title>Components</v-list-item-title>
               </v-list-item>
-              <v-list-item to="/folder-test" prepend-icon="mdi-folder-search-outline" class="menu-item">
-                <v-list-item-title class="text-body-2">Folder Test</v-list-item-title>
+              <v-list-item to="/folder-test" prepend-icon="mdi-folder-search-outline" class="menu-item rounded-pill mx-2">
+                <v-list-item-title>Folders</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -55,15 +51,15 @@
       </div>
     </header>
 
-    <v-main class="main-content pt-14">
+    <v-main class="main-content pt-16">
       <div class="content-wrapper mx-auto">
         <router-view #default="{ Component, route }">
-          <transition name="fade" mode="out-in">
+          <transition name="liquid-fade" mode="out-in">
             <keep-alive>
               <component v-if="route.meta.keepAlive" :is="Component" :key="route.fullPath" />
             </keep-alive>
           </transition>
-          <transition name="fade" mode="out-in">
+          <transition name="liquid-fade" mode="out-in">
             <component v-if="!route.meta.keepAlive" :is="Component" />
           </transition>
         </router-view>
@@ -157,26 +153,37 @@ const onScroll = (event: Event) => {
 
 <style scoped lang="scss">
 .app-container {
-  background-color: rgb(var(--v-theme-background));
+  background-color: transparent !important;
   min-height: 100vh;
 }
 
-/* Utilitarian Header */
-.util-header {
+/* Glassmorphism Header */
+.glass-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  background-color: rgba(var(--v-theme-surface), 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgb(var(--v-theme-border-color));
-  transition: all 0.2s ease;
-  height: 56px;
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  height: 64px;
+
+  .v-theme--dark & {
+    background-color: rgba(15, 23, 42, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
 
   &.scrolled {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    
+    .v-theme--dark & {
+      background-color: rgba(15, 23, 42, 0.4);
+    }
   }
 }
 
@@ -186,69 +193,117 @@ const onScroll = (event: Event) => {
 }
 
 .logo-area {
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
   
   &:hover {
     opacity: 0.8;
+    .logo-orb {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgb(var(--v-theme-accent));
+    }
   }
 }
 
+.logo-orb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgb(var(--v-theme-accent)), #FF9A9E);
+  box-shadow: 0 0 10px rgba(var(--v-theme-accent), 0.5);
+  transition: all 0.3s ease;
+}
+
 .logo-text {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   letter-spacing: -0.5px;
   color: rgb(var(--v-theme-primary));
+  text-shadow: 0 2px 10px rgba(255,255,255,0.2);
+  
+  .v-theme--dark & {
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
 }
 
 .nav-area {
-  gap: 8px;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 12px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  
+  .v-theme--dark & {
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 6px 12px;
-  color: rgb(var(--v-theme-secondary));
+  padding: 8px 20px;
+  color: rgb(var(--v-theme-primary));
+  opacity: 0.7;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 500;
-  border-radius: 6px;
-  transition: all 0.15s ease;
+  border-radius: 100px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
-    color: rgb(var(--v-theme-primary));
+    opacity: 1;
     background-color: rgba(var(--v-theme-primary), 0.05);
   }
 
   &.active {
-    color: rgb(var(--v-theme-primary));
-    background-color: rgba(var(--v-theme-primary), 0.08);
+    opacity: 1;
+    background-color: rgb(var(--v-theme-primary));
+    color: rgb(var(--v-theme-background));
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
 }
 
-.divider-vertical {
-  width: 1px;
-  height: 24px;
-  background-color: rgb(var(--v-theme-border-color));
+.fw-bold {
+  font-weight: 700;
 }
 
 .tool-btn {
-  transition: all 0.15s ease;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  .v-theme--dark & {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.05);
+  }
   
   &:hover {
-    color: rgb(var(--v-theme-primary)) !important;
-    background-color: rgba(var(--v-theme-primary), 0.05);
+    transform: translateY(-2px);
+    background: rgba(var(--v-theme-primary), 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   }
 }
 
-.util-menu {
-  border: 1px solid rgb(var(--v-theme-border-color));
-  background: rgb(var(--v-theme-surface));
+.glass-menu {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 20px !important;
+  padding: 8px 0;
+  
+  .v-theme--dark & {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
   
   .menu-item {
-    transition: background-color 0.15s;
+    transition: all 0.2s ease;
     
     &:hover {
-      background-color: rgba(var(--v-theme-primary), 0.05);
+      background-color: rgba(var(--v-theme-primary), 0.08);
+      transform: translateX(4px);
     }
   }
 }
@@ -258,18 +313,22 @@ const onScroll = (event: Event) => {
 }
 
 .content-wrapper {
-  max-width: 1200px;
-  padding: 32px 24px;
+  max-width: 1400px;
+  padding: 40px 24px;
 }
 
-/* Fade Transitions */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
+/* Liquid Fade Transitions */
+.liquid-fade-enter-active,
+.liquid-fade-leave-active {
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.fade-enter-from,
-.fade-leave-to {
+.liquid-fade-enter-from {
   opacity: 0;
+  transform: translateY(20px) scale(0.98);
+}
+.liquid-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.98);
 }
 
 @media (max-width: 960px) {
